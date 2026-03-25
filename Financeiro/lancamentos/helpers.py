@@ -143,6 +143,47 @@ class LancamentoHelper(ModelHelper):
             .order_by("-total")
         )
 
+    def obter_lancamentos_periodo(self, meses=3):
+        """
+        Retorna receitas e despesas dos últimos ``meses`` meses formatadas
+        como texto resumido para envio a APIs de análise.
+        """
+        from datetime import date
+        from dateutil.relativedelta import relativedelta
+        from .models import Lancamento
+
+        usuario = self.model_instance.usuario
+        data_inicio = date.today() - relativedelta(months=meses)
+
+        qs = (
+            Lancamento.objects.filter(
+                usuario=usuario,
+                data__gte=data_inicio,
+            )
+            .select_related("categoria")
+            .order_by("data")
+        )
+
+        receitas = []
+        despesas = []
+        for lanc in qs:
+            linha = (
+                f"{lanc.data.strftime('%d/%m/%Y')} | "
+                f"{lanc.descricao} | "
+                f"{lanc.categoria.nome} | "
+                f"R$ {lanc.valor}"
+            )
+            if lanc.tipo == Lancamento.TIPO_RECEITA:
+                receitas.append(linha)
+            else:
+                despesas.append(linha)
+
+        return {
+            "receitas": receitas,
+            "despesas": despesas,
+            "total_registros": len(receitas) + len(despesas),
+        }
+
     def obter_taxa_moeda(self):
         """
         Retorna a taxa_inversa (bid) da moeda preferida do usuário autenticado.

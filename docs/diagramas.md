@@ -487,3 +487,125 @@ Ativo --> Historico : qualquer alteração\n(django-simple-history)
 Historico --> [*] : consulta histórico
 @enduml
 ```
+
+---
+
+## 7. Diagrama de Sequência — Análise Financeira IA
+
+### Mermaid
+
+```mermaid
+sequenceDiagram
+    actor U as Usuário
+    participant D as Dashboard (JS)
+    participant V as AnaliseFinanceiraView
+    participant B as LancamentoBusiness
+    participant R as LancamentoRules
+    participant H as LancamentoHelper
+    participant API as OpenAI API
+
+    U->>D: Clica "Análise Financeira IA"
+    D->>D: Exibir loading overlay
+    D->>V: POST /financeiro/analise/ (AJAX + CSRF)
+    V->>B: gerar_analise_financeira()
+    B->>R: validar_possui_lancamentos()
+    alt Sem lançamentos
+        R-->>B: BusinessRulesExceptions
+        B-->>V: Exceção relançada
+        V-->>D: JSON {success: false, error: "..."}
+        D->>D: Esconder loading
+        D->>U: Modal com mensagem de erro
+    end
+    R-->>B: False (ok)
+    B->>H: obter_lancamentos_periodo(meses=3)
+    H-->>B: {receitas: [...], despesas: [...]}
+    B->>B: Montar prompt
+    B->>B: Ler OPENAI_API_KEY do .env
+    alt Sem API Key
+        B-->>V: ProcessException
+        V-->>D: JSON {success: false, error: "..."}
+        D->>D: Esconder loading
+        D->>U: Modal com mensagem de erro
+    end
+    B->>API: POST /v1/chat/completions
+    alt Timeout / Erro conexão
+        API-->>B: Timeout / ConnectionError
+        B-->>V: ProcessException
+        V-->>D: JSON {success: false, error: "..."}
+        D->>D: Esconder loading
+        D->>U: Modal com mensagem de erro
+    end
+    API-->>B: 200 {choices: [{message: {content: "..."}}]}
+    B-->>V: Texto da análise
+    V-->>D: JSON {success: true, analise: "..."}
+    D->>D: Esconder loading
+    D->>U: Modal com análise financeira
+```
+
+### PlantUML
+
+```plantuml
+@startuml Sequência - Análise Financeira IA
+actor "Usuário" as U
+participant "Dashboard (JS)" as D
+participant "AnaliseFinanceiraView" as V
+participant "LancamentoBusiness" as B
+participant "LancamentoRules" as R
+participant "LancamentoHelper" as H
+participant "OpenAI API" as API
+
+U -> D : Clica "Análise Financeira IA"
+activate D
+D -> D : Exibir loading overlay
+D -> V : POST /financeiro/analise/ (AJAX + CSRF)
+activate V
+V -> B : gerar_analise_financeira()
+activate B
+B -> R : validar_possui_lancamentos()
+activate R
+alt Sem lançamentos nos últimos 3 meses
+    R --> B : <<BusinessRulesExceptions>>
+    B --> V : Exceção relançada
+    V --> D : JSON {success: false, error: "..."}
+    D -> D : Esconder loading
+    D -> U : Modal com mensagem de erro
+end
+R --> B : False (ok)
+deactivate R
+
+B -> H : obter_lancamentos_periodo(meses=3)
+activate H
+H --> B : {receitas, despesas, total_registros}
+deactivate H
+
+B -> B : Montar prompt com receitas e despesas
+B -> B : Ler OPENAI_API_KEY via decouple
+
+alt API Key não configurada
+    B --> V : <<ProcessException>>
+    V --> D : JSON {success: false, error: "..."}
+    D -> D : Esconder loading
+    D -> U : Modal com mensagem de erro
+end
+
+B -> API : POST /v1/chat/completions
+activate API
+alt Timeout ou erro de conexão
+    API --> B : Timeout / ConnectionError
+    B --> V : <<ProcessException>>
+    V --> D : JSON {success: false, error: "..."}
+    D -> D : Esconder loading
+    D -> U : Modal com mensagem de erro
+end
+API --> B : 200 OK {choices: [{message: {content: "análise"}}]}
+deactivate API
+
+B --> V : texto da análise
+deactivate B
+V --> D : JSON {success: true, analise: "..."}
+deactivate V
+D -> D : Esconder loading
+D -> U : Modal com análise financeira completa
+deactivate D
+@enduml
+```

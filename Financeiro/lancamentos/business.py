@@ -106,3 +106,95 @@ class LancamentoBusiness(ModelBusiness):
             raise SystemErrorException(
                 _("Erro inesperado ao excluir lançamento.")
             ) from exc
+
+    def gerar_analise_financeira(self):
+        """Valida dados, monta prompt e solicita análise à API OpenAI."""
+        import logging
+        from decouple import config as decouple_config
+        import requests as http_requests
+
+        logger = logging.getLogger(__name__)
+
+        try:
+            self.model_instance.rules.validar_possui_lancamentos()
+
+            dados = self.model_instance.helper.obter_lancamentos_periodo(meses=3)
+
+            receitas_txt = "\n".join(dados["receitas"]) or "Nenhuma receita registrada."
+            despesas_txt = "\n".join(dados["despesas"]) or "Nenhuma despesa registrada."
+
+            prompt = (
+                "Você é um consultor financeiro pessoal. Analise os dados financeiros "
+                "abaixo dos últimos 3 meses e forneça:\n\n"
+                "1. **Maiores gastos**: identifique as categorias e itens com maiores despesas.\n"
+                "2. **Projeção para 1 mês à frente**: expectativa de receitas e despesas.\n"
+                "3. **Projeção para 3 meses à frente**: expectativa de receitas e despesas.\n"
+                "4. **Projeção para 1 ano à frente**: expectativa de receitas e despesas.\n"
+                "5. **Recomendações**: sugestões práticas para melhorar a saúde financeira.\n\n"
+                "Seja realista e objetivo. Use os dados reais fornecidos.\n\n"
+                f"--- RECEITAS ---\n{receitas_txt}\n\n"
+                f"--- DESPESAS ---\n{despesas_txt}"
+            )
+
+            api_key = decouple_config("OPENAI_API_KEY", default="")
+            if not api_key:
+                raise ProcessException(
+                    _("Chave da API OpenAI não configurada. Configure OPENAI_API_KEY no .env.")
+                )
+
+            response = http_requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": decouple_config("OPENAI_MODEL", default="gpt-4o-mini"),
+                    "messages": [
+                        {"role": "system", "content": "Você é um consultor financeiro pessoal experiente."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 2000,
+                },
+                timeout=60,
+            )
+
+            if response.status_code != 200:
+                logger.error(
+                    "Erro na API OpenAI: status=%s body=%s",
+                    response.status_code,
+                    response.text[:500],
+                )
+                raise ProcessException(
+                    _("Não foi possível obter a análise. Tente novamente mais tarde.")
+                )
+
+            resultado = response.json()
+            analise = (
+                resultado.get("choices", [{}])[0]
+                .get("message", {})
+                .get("content", "")
+            )
+
+            if not analise:
+                raise ProcessException(
+                    _("A API retornou uma resposta vazia. Tente novamente.")
+                )
+
+            return analise
+
+        except (BusinessRulesExceptions, ProcessException):
+            raise
+        except http_requests.Timeout:
+            raise ProcessException(
+                _("A análise demorou demais. Tente novamente em alguns instantes.")
+            )
+        except http_requests.ConnectionError:
+            raise ProcessException(
+                _("Erro de conexão com o serviço de análise. Verifique sua internet.")
+            )
+        except Exception as exc:
+            raise SystemErrorException(
+                _("Erro inesperado ao gerar análise financeira.")
+            ) from exc

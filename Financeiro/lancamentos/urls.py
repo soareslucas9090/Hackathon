@@ -8,6 +8,8 @@ app_name = "financeiro"
 urlpatterns = [
     # Dashboard
     path("", views.DashboardView.as_view(), name="dashboard"),
+    # Análise financeira IA
+    path("analise/", views.AnaliseFinanceiraView.as_view(), name="analise-financeira"),
     # Lançamentos
     path("lancamentos/", views.LancamentoListView.as_view(), name="lancamento-lista"),
     path("lancamentos/novo/", views.LancamentoCreateView.as_view(), name="lancamento-criar"),

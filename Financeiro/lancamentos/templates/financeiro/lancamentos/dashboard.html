@@ -5,6 +5,44 @@
 <!-- Cards de saldo -->
 {% include "financeiro/lancamentos/partials/cards_saldo.html" %}
 
+<!-- Botão Análise IA -->
+<div class="text-end mt-3">
+  <button type="button" id="btnAnalise" class="btn btn-outline-primary">
+    <i class="bi bi-robot me-1"></i>{% trans "Análise Financeira IA" %}
+  </button>
+</div>
+
+<!-- Loading overlay (tela travada) -->
+<div id="analiseLoading" class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+     style="background:rgba(0,0,0,0.55);z-index:9999;">
+  <div class="text-center text-white">
+    <div class="spinner-border text-light mb-3" style="width:3rem;height:3rem;" role="status">
+      <span class="visually-hidden">{% trans "Carregando..." %}</span>
+    </div>
+    <p class="fs-5 fw-semibold">{% trans "Gerando análise financeira..." %}</p>
+    <p class="small text-light opacity-75">{% trans "Isso pode levar alguns segundos." %}</p>
+  </div>
+</div>
+
+<!-- Modal resultado da análise -->
+<div class="modal fade" id="modalAnalise" tabindex="-1" aria-labelledby="modalAnaliseLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalAnaliseLabel">
+          <i class="bi bi-robot me-2"></i>{% trans "Análise Financeira IA" %}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans "Fechar" %}"></button>
+      </div>
+      <div class="modal-body" id="analiseConteudo" style="overflow-y:auto;max-height:65vh;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Fechar" %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row g-4 mt-1">
 
   <!-- Gráfico de barras: receitas x despesas por mês -->
@@ -163,5 +201,64 @@ if (catLabels.length) {
   document.getElementById("graficoCategorias").closest(".card-body").innerHTML =
     '<p class="text-muted text-center">{% filter escapejs %}{% trans "Nenhuma despesa registrada." %}{% endfilter %}</p>';
 }
+</script>
+
+<!-- marked.js — renderização de Markdown no modal -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+
+<!-- JS do botão Análise IA -->
+<script>
+(function() {
+  var btnAnalise = document.getElementById('btnAnalise');
+  var loading = document.getElementById('analiseLoading');
+  var conteudo = document.getElementById('analiseConteudo');
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  btnAnalise.addEventListener('click', function() {
+    // Mostrar loading e travar tela
+    loading.classList.remove('d-none');
+    loading.classList.add('d-flex');
+    btnAnalise.disabled = true;
+
+    fetch("{% url 'financeiro:analise-financeira' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+    })
+    .then(function(resp) {
+      return resp.json().then(function(data) {
+        return { status: resp.status, body: data };
+      });
+    })
+    .then(function(result) {
+      loading.classList.add('d-none');
+      loading.classList.remove('d-flex');
+      btnAnalise.disabled = false;
+
+      if (result.body.success && result.body.analise) {
+        conteudo.innerHTML = marked.parse(result.body.analise);
+        var modal = new bootstrap.Modal(document.getElementById('modalAnalise'));
+        modal.show();
+      } else {
+        var msg = result.body.error || "{% filter escapejs %}{% trans 'Erro ao gerar análise. Tente novamente.' %}{% endfilter %}";
+        conteudo.innerHTML = '<p class="text-danger">' + msg + '</p>';
+        var modal = new bootstrap.Modal(document.getElementById('modalAnalise'));
+        modal.show();
+      }
+    })
+    .catch(function() {
+      loading.classList.add('d-none');
+      loading.classList.remove('d-flex');
+      btnAnalise.disabled = false;
+      conteudo.innerHTML = '<p class="text-danger">{% filter escapejs %}{% trans "Erro de conexão. Verifique sua internet e tente novamente." %}{% endfilter %}</p>';
+      var modal = new bootstrap.Modal(document.getElementById('modalAnalise'));
+      modal.show();
+    });
+  });
+})();
 </script>
 {% endblock %}

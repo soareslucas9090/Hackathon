@@ -13,6 +13,7 @@ Cobertura:
 - CategoriaDeleteView (AJAX)
 - RelatorioView
 - RelatorioPDFView
+- AnaliseFinanceiraView (AJAX + mock OpenAI)
 - Isolamento entre usuários (usuário A não vê dados de B)
 
 Execução::
@@ -22,6 +23,7 @@ Execução::
 import json
 from datetime import date
 from decimal import Decimal
+from unittest.mock import patch, MagicMock
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -100,6 +102,10 @@ class RedirecionamentoSemLoginTest(TestCase):
 
     def test_relatorio_redireciona(self):
         response = self.client.get(reverse("financeiro:relatorio"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_analise_redireciona(self):
+        response = self.client.post(reverse("financeiro:analise-financeira"))
         self.assertEqual(response.status_code, 302)
 
 
@@ -417,3 +423,83 @@ class RelatorioPDFViewTest(BaseFinanceiroTestCase):
         response = self.client.get(reverse("financeiro:relatorio-pdf"))
         self.assertIn("attachment", response["Content-Disposition"])
         self.assertIn(".pdf", response["Content-Disposition"])
+
+
+# ─────────────────────────────────────────── Análise IA ──────────────────────
+
+class AnaliseFinanceiraViewTest(BaseFinanceiroTestCase):
+    """Testes da AnaliseFinanceiraView (AJAX + mock OpenAI)."""
+
+    def _url(self):
+        return reverse("financeiro:analise-financeira")
+
+    def test_get_nao_permitido(self):
+        response = self.client.get(self._url())
+        self.assertEqual(response.status_code, 405)
+
+    @patch("Financeiro.lancamentos.business.http_requests.post")
+    @patch("Financeiro.lancamentos.business.decouple_config")
+    def test_analise_sucesso(self, mock_config, mock_post):
+        mock_config.side_effect = lambda key, **kw: (
+            "fake-key" if key == "OPENAI_API_KEY" else kw.get("default", "")
+        )
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "choices": [{"message": {"content": "Análise gerada com sucesso."}}]
+        }
+        mock_post.return_value = mock_response
+
+        response = self.client.post(self._url())
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertTrue(data["success"])
+        self.assertIn("analise", data)
+        self.assertEqual(data["analise"], "Análise gerada com sucesso.")
+
+    @patch("Financeiro.lancamentos.business.decouple_config")
+    def test_analise_sem_api_key(self, mock_config):
+        mock_config.side_effect = lambda key, **kw: (
+            "" if key == "OPENAI_API_KEY" else kw.get("default", "")
+        )
+        response = self.client.post(self._url())
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])
+
+    def test_analise_sem_lancamentos(self):
+        Lancamento.objects.filter(usuario=self.usuario).delete()
+        response = self.client.post(self._url())
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])
+
+    @patch("Financeiro.lancamentos.business.http_requests.post")
+    @patch("Financeiro.lancamentos.business.decouple_config")
+    def test_analise_api_erro_500(self, mock_config, mock_post):
+        mock_config.side_effect = lambda key, **kw: (
+            "fake-key" if key == "OPENAI_API_KEY" else kw.get("default", "")
+        )
+        mock_response = MagicMock()
+        mock_response.status_code = 500
+        mock_response.text = "Internal Server Error"
+        mock_post.return_value = mock_response
+
+        response = self.client.post(self._url())
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])
+
+    @patch("Financeiro.lancamentos.business.http_requests.post")
+    @patch("Financeiro.lancamentos.business.decouple_config")
+    def test_analise_timeout(self, mock_config, mock_post):
+        import requests as http_requests
+        mock_config.side_effect = lambda key, **kw: (
+            "fake-key" if key == "OPENAI_API_KEY" else kw.get("default", "")
+        )
+        mock_post.side_effect = http_requests.Timeout("timeout")
+
+        response = self.client.post(self._url())
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])

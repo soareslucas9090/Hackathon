@@ -1,5 +1,6 @@
 """Views do módulo Financeiro."""
 import json
+import logging
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -22,6 +23,8 @@ from core.views import (
     BasicTemplateView,
     BasicUpdateView,
 )
+
+logger = logging.getLogger(__name__)
 
 from common.util import calcular_saldo_por_queryset
 from .forms import CategoriaForm, LancamentoForm
@@ -60,6 +63,17 @@ class DashboardView(BasicTemplateView):
 
         ctx["page_title"] = _("Dashboard")
         return ctx
+
+
+# ─────────────────────────────────────────── Análise IA ──────────────────────
+
+class AnaliseFinanceiraView(BasicActionView):
+    """Endpoint AJAX que gera análise financeira via API OpenAI."""
+
+    def post(self, request, *args, **kwargs):
+        _proxy = Lancamento(usuario=request.user)
+        analise = _proxy.business.gerar_analise_financeira()
+        return self.json_success({"analise": analise})
 
 
 # ─────────────────────────────────────────── Lançamentos ─────────────────────

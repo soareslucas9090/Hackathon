@@ -60,3 +60,20 @@ class LancamentoRules(ModelRules):
                 _("A categoria selecionada não pertence ao seu usuário.")
             )
         return False
+
+    def validar_possui_lancamentos(self):
+        """Valida que o usuário possui lançamentos nos últimos 3 meses para análise."""
+        from datetime import date
+        from dateutil.relativedelta import relativedelta
+        from .models import Lancamento
+
+        data_inicio = date.today() - relativedelta(months=3)
+        existe = Lancamento.objects.filter(
+            usuario=self.model_instance.usuario,
+            data__gte=data_inicio,
+        ).exists()
+        if not existe:
+            raise BusinessRulesExceptions(
+                _("Não há lançamentos nos últimos 3 meses para gerar a análise.")
+            )
+        return False

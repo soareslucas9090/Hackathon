@@ -3,6 +3,7 @@ import json
 from decimal import Decimal
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import get_template
@@ -120,8 +121,11 @@ class LancamentoUpdateView(BasicUpdateView):
     template_name = "financeiro/lancamentos/lancamento_form.html"
     success_url = reverse_lazy("financeiro:lancamento-lista")
 
-    def get_queryset(self):
-        return Lancamento.objects.filter(usuario=self.request.user)
+    def get_object(self, queryset=None):
+        obj = get_object_or_404(Lancamento, pk=self.kwargs["pk"])
+        if obj.usuario != self.request.user:
+            raise PermissionDenied
+        return obj
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -142,7 +146,9 @@ class LancamentoUpdateView(BasicUpdateView):
 
 class LancamentoDeleteView(BasicActionView):
     def post(self, request, pk, *args, **kwargs):
-        lancamento = get_object_or_404(Lancamento, pk=pk, usuario=request.user)
+        lancamento = get_object_or_404(Lancamento, pk=pk)
+        if lancamento.usuario != request.user:
+            raise PermissionDenied
         lancamento.business.excluir()
         return self.json_success(MSG_EXCLUIDO_SUCESSO)
 
@@ -198,8 +204,11 @@ class CategoriaUpdateView(BasicUpdateView):
     template_name = "financeiro/lancamentos/categoria_form.html"
     success_url = reverse_lazy("financeiro:categoria-lista")
 
-    def get_queryset(self):
-        return Categoria.objects.filter(usuario=self.request.user)
+    def get_object(self, queryset=None):
+        obj = get_object_or_404(Categoria, pk=self.kwargs["pk"])
+        if obj.usuario != self.request.user:
+            raise PermissionDenied
+        return obj
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -220,7 +229,9 @@ class CategoriaUpdateView(BasicUpdateView):
 
 class CategoriaDeleteView(BasicActionView):
     def post(self, request, pk, *args, **kwargs):
-        categoria = get_object_or_404(Categoria, pk=pk, usuario=request.user)
+        categoria = get_object_or_404(Categoria, pk=pk)
+        if categoria.usuario != request.user:
+            raise PermissionDenied
         categoria.business.excluir()
         return self.json_success(MSG_EXCLUIDO_SUCESSO)
 

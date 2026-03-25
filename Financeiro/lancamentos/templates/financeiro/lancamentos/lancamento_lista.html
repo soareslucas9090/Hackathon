@@ -59,6 +59,7 @@
 
 {% block extra_js %}
 <script>
+/* ── Filtro AJAX ───────────────────────────────────────────────────────── */
 document.getElementById("form-filtros").addEventListener("submit", function (e) {
   e.preventDefault();
   const params = new URLSearchParams(new FormData(this));
@@ -68,6 +69,27 @@ document.getElementById("form-filtros").addEventListener("submit", function (e) 
     .then(r => r.text())
     .then(html => { document.getElementById("tabela-lancamentos").innerHTML = html; })
     .catch(() => this.submit());
+});
+
+/* ── Exclusão via Event Delegation ────────────────────────────────────── */
+/* O listener fica no container pai (#tabela-lancamentos), que não é        */
+/* destruído pelo innerHTML do filtro AJAX. Funciona antes e após filtrar.  */
+document.getElementById("tabela-lancamentos").addEventListener("click", function (e) {
+  const btn = e.target.closest(".btn-excluir");
+  if (!btn) return;
+  if (!confirm("Deseja realmente excluir este lançamento?")) return;
+  fetch(btn.dataset.url, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}",
+      "Content-Type": "application/json"
+    }
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) location.reload();
+      else alert(data.error || "Erro ao excluir.");
+    });
 });
 </script>
 {% endblock %}

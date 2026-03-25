@@ -54,23 +54,3 @@
     </div>
   </div>
 </div>
-
-<script>
-document.querySelectorAll(".btn-excluir").forEach(btn => {
-  btn.addEventListener("click", function () {
-    if (!confirm("Deseja realmente excluir este lançamento?")) return;
-    fetch(this.dataset.url, {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": "{{ csrf_token }}",
-        "Content-Type": "application/json"
-      }
-    })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) location.reload();
-        else alert(data.error || "Erro ao excluir.");
-      });
-  });
-});
-</script>

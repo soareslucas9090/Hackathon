@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- Anti-FOUC: aplica tema ANTES do CSS ser renderizado -->
+    <script>document.documentElement.setAttribute('data-bs-theme', localStorage.getItem('theme') || 'light');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Gestão Financeira Pessoal{% endblock %}</title>
@@ -16,7 +18,34 @@
             --sidebar-text: #c7d2fe;
             --sidebar-active: #4f46e5;
         }
-        body { background-color: #f1f5f9; }
+        /* Fundo levemente acinzentado no modo claro (padrão do sistema) */
+        [data-bs-theme="light"] {
+            --bs-body-bg: #f1f5f9;
+        }
+        /* Sidebar mais sutil no modo noturno — menor saturação */
+        [data-bs-theme="dark"] {
+            --sidebar-bg: #1a1a2e;
+        }
+        /* Transição suave de cores — ativa APENAS durante o clique no toggle
+           (a classe .theme-transitioning é adicionada/removida via JS,
+            evitando flash de transição no carregamento da página) */
+        html.theme-transitioning body,
+        html.theme-transitioning .card,
+        html.theme-transitioning .card-header,
+        html.theme-transitioning .card-footer,
+        html.theme-transitioning header,
+        html.theme-transitioning footer,
+        html.theme-transitioning #sidebar,
+        html.theme-transitioning .nav-link,
+        html.theme-transitioning .table,
+        html.theme-transitioning .form-control,
+        html.theme-transitioning .form-select,
+        html.theme-transitioning .modal-content,
+        html.theme-transitioning .alert,
+        html.theme-transitioning .btn {
+            transition: background-color 0.1s ease, color 0.07s ease,
+                        border-color 0.18s ease, box-shadow 0.15s ease !important;
+        }
     </style>
     <meta name="csrf-token" content="{{ csrf_token }}">
     {% block extra_css %}{% endblock %}
@@ -57,6 +86,55 @@
     <!-- IMask.js — máscara de campos monetários -->
     <script src="https://cdn.jsdelivr.net/npm/imask@7.6.1/dist/imask.min.js"></script>
     {% block extra_js %}{% endblock %}
+
+    <!-- ─── Dark Mode Toggle ──────────────────────────────────────────────── -->
+    <script>
+    (function () {
+        function syncIcon(theme) {
+            var btn = document.getElementById('btnToggleTema');
+            if (!btn) return;
+            var icon = btn.querySelector('i');
+            if (theme === 'dark') {
+                icon.className = 'bi bi-sun-fill';
+                btn.setAttribute('title', 'Mudar para modo claro');
+            } else {
+                icon.className = 'bi bi-moon-fill';
+                btn.setAttribute('title', 'Mudar para modo escuro');
+            }
+        }
+
+        // Sincroniza ícone com o tema já aplicado pelo anti-FOUC
+        var currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        syncIcon(currentTheme);
+
+        var btn = document.getElementById('btnToggleTema');
+        if (btn) {
+            btn.addEventListener('click', function () {
+                var next = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+
+                // Ativa transições de cor apenas durante este ciclo de toggle
+                document.documentElement.classList.add('theme-transitioning');
+                setTimeout(function () {
+                    document.documentElement.classList.remove('theme-transitioning');
+                }, 350);
+
+                document.documentElement.setAttribute('data-bs-theme', next);
+                localStorage.setItem('theme', next);
+
+                // Animação do ícone: encolhe + gira → troca → volta
+                var icon = btn.querySelector('i');
+                icon.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+                icon.style.transform = 'scale(0) rotate(90deg)';
+                icon.style.opacity = '0';
+                setTimeout(function () {
+                    syncIcon(next);
+                    icon.style.transform = 'scale(1) rotate(0deg)';
+                    icon.style.opacity = '1';
+                }, 150);
+            });
+        }
+    })();
+    </script>
 
     <!-- JS genérico de exclusão via modal — funciona em todo o sistema -->
     <script>

@@ -95,6 +95,11 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+// Adaptar cores do Chart.js ao tema ativo (light / dark)
+var _cs = getComputedStyle(document.documentElement);
+Chart.defaults.color = _cs.getPropertyValue('--bs-body-color').trim() || '#212529';
+Chart.defaults.borderColor = _cs.getPropertyValue('--bs-border-color').trim() || 'rgba(0,0,0,0.1)';
+
 // Taxa de conversão injetada pelo context processor
 const moedaTaxa = parseFloat("{{ moeda_usuario.taxa }}");
 const moedaSimbolo = "{{ moeda_usuario.simbolo }}";

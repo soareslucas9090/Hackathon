@@ -77,12 +77,19 @@
     <div class="flex-grow-1 d-flex flex-column">
 
         <!-- Topbar -->
-        <header class="bg-white shadow-sm px-4 py-3 d-flex align-items-center justify-content-between">
-            <h5 class="mb-0 fw-semibold text-dark">{% block page_title %}{% endblock %}</h5>
-            <span class="text-muted small">
-                <i class="bi bi-calendar3 me-1"></i>
-                {% now "d/m/Y" %}
-            </span>
+        <header class="bg-body shadow-sm px-4 py-3 d-flex align-items-center justify-content-between">
+            <h5 class="mb-0 fw-semibold text-body">{% block page_title %}{% endblock %}</h5>
+            <div class="d-flex align-items-center gap-3">
+                <button type="button" id="btnToggleTema"
+                        class="btn btn-link text-body p-0 border-0 fs-5 lh-1"
+                        title="Mudar para modo escuro">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+                <span class="text-muted small">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    {% now "d/m/Y" %}
+                </span>
+            </div>
         </header>
 
         <!-- Flash messages -->
@@ -103,7 +110,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white text-center py-2 text-muted small border-top">
+        <footer class="bg-body text-center py-2 text-muted small border-top">
             Gestão Financeira Pessoal &copy; {% now "Y" %}
         </footer>
     </div>

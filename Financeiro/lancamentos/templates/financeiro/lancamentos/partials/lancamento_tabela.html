@@ -39,6 +39,9 @@
               <button type="button"
                       class="btn btn-sm btn-outline-danger btn-excluir"
                       data-url="{% url 'financeiro:lancamento-excluir' l.pk %}"
+                      data-excluir-msg="Deseja realmente excluir o lançamento &ldquo;{{ l.descricao }}&rdquo;?"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalConfirmarExclusao"
                       title="Excluir">
                 <i class="bi bi-trash"></i>
               </button>

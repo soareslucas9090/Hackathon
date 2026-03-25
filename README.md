@@ -1,120 +1,170 @@
-# Gestão Financeira Pessoal
+<div align="center">
 
-Sistema web para controle de finanças pessoais, desenvolvido em Django com arquitetura em camadas como parte do Hackathon **Ctrl+Alt+AI: Hackeando a Rotina de Programação** (M2A / IntGest).
+# 💰 Gestão Financeira Pessoal
 
----
+**Controle suas finanças de forma simples, clara e segura.**
 
-## Sumário
-
-- [Objetivo](#objetivo)
-- [Funcionalidades](#funcionalidades)
-- [Stack](#stack)
-- [Arquitetura](#arquitetura)
-- [Estrutura de Pastas](#estrutura-de-pastas)
-- [Como Executar](#como-executar)
-- [Variáveis de Ambiente](#variáveis-de-ambiente)
-- [Rotas Principais](#rotas-principais)
-- [Testes](#testes)
-- [Comandos Úteis](#comandos-úteis)
-- [Usuários de Demonstração](#usuários-de-demonstração)
-- [Diagramas](docs/diagramas.md)
+Desenvolvido em Django com arquitetura em camadas como parte do Hackathon  
+**⚡ Ctrl+Alt+AI: Hackeando a Rotina de Programação** — M2A / IntGest
 
 ---
 
-## Objetivo
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-6.0.3-092E20?style=for-the-badge&logo=django&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![License](https://img.shields.io/badge/Licen%C3%A7a-MIT-green?style=for-the-badge)
 
-Prova de Conceito de um mini software de **Gestão Financeira Pessoal** que permite:
-
-- Registrar receitas e despesas com categorias.
-- Visualizar saldo atualizado automaticamente.
-- Ver um dashboard com resumo financeiro e gráficos.
-- Gerenciar lançamentos (criar, editar, excluir) com dados isolados por usuário.
-- Exportar relatórios filtrados em PDF.
+</div>
 
 ---
 
-## Funcionalidades
+## 📋 Sumário
 
-| # | Funcionalidade | Descrição |
-|---|---|---|
-| 1 | Cadastro de receitas | Crie entradas financeiras com categoria, data e valor |
-| 2 | Cadastro de despesas | Crie saídas financeiras com categoria, data e valor |
-| 3 | Categorias personalizadas | Crie, edite e exclua categorias com cor e nome únicos por usuário |
-| 4 | Listagem com filtros | Filtre lançamentos por tipo, categoria, período e busca textual |
-| 5 | Saldo automático | Receitas − Despesas calculadas em tempo real |
-| 6 | Dashboard com gráficos | Gráfico de barras mensal e gráfico de rosca por categoria |
-| 7 | Relatório com exportação PDF | Relatório filtrado exportável via xhtml2pdf |
-| 8 | Isolamento por usuário | Cada usuário vê somente seus próprios dados |
-| 9 | Admin restrito a superusuários | Painel Django Admin disponível apenas para `is_superuser=True` |
-| 10 | Histórico de alterações | django-simple-history registra todo histórico de edições |
-
----
-
-## Stack
-
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| Python | 3.x | Linguagem principal |
-| Django | 6.0.3 | Framework web |
-| SQLite | — | Banco de dados local |
-| django-simple-history | 3.11.0 | Histórico de alterações nos models |
-| python-decouple | 3.8 | Gerenciamento de variáveis de ambiente |
-| xhtml2pdf | 0.2.17 | Exportação de relatórios em PDF |
-| Bootstrap | 5 CDN | Interface responsiva |
-| Chart.js | 4.4.0 CDN | Gráficos no dashboard |
+- [🎯 Objetivo](#-objetivo)
+- [✨ Funcionalidades](#-funcionalidades)
+- [🧰 Stack e Pacotes](#-stack-e-pacotes)
+- [🏗️ Arquitetura](#️-arquitetura)
+- [📁 Estrutura de Pastas](#-estrutura-de-pastas)
+- [🚀 Como Executar](#-como-executar)
+- [⚙️ Variáveis de Ambiente](#️-variáveis-de-ambiente)
+- [🛣️ Rotas Principais](#️-rotas-principais)
+- [🧪 Testes](#-testes)
+- [🔧 Comandos Úteis](#-comandos-úteis)
+- [👥 Usuários de Demonstração](#-usuários-de-demonstração)
+- [📊 Diagramas](docs/diagramas.md)
 
 ---
 
-## Arquitetura
+## 🎯 Objetivo
 
-O projeto segue uma **arquitetura em camadas por domínio**:
+Uma **Prova de Conceito** de software de Gestão Financeira Pessoal que traz o essencial para quem quer ter controle real sobre o próprio dinheiro — sem complicação, sem excesso.
+
+Com ele você consegue:
+
+- 📥 **Registrar receitas e despesas** organizadas por categorias personalizadas
+- 💹 **Visualizar o saldo** atualizado automaticamente em tempo real
+- 📊 **Explorar um dashboard** com resumo financeiro e gráficos interativos
+- ✏️ **Gerenciar lançamentos** completos: criar, editar e excluir, com dados totalmente isolados por usuário
+- 📄 **Exportar relatórios filtrados** diretamente em PDF
+
+---
+
+## ✨ Funcionalidades
+
+| # | Funcionalidade | O que faz |
+|:---:|---|---|
+| 💵 | **Cadastro de receitas** | Registra entradas financeiras com categoria, data e valor |
+| 💸 | **Cadastro de despesas** | Registra saídas financeiras com categoria, data e valor |
+| 🏷️ | **Categorias personalizadas** | Crie, edite e exclua categorias com cor e nome únicos por usuário |
+| 🔍 | **Listagem com filtros** | Filtre por tipo, categoria, período e busca textual |
+| ⚖️ | **Saldo automático** | Receitas − Despesas calculadas em tempo real |
+| 📈 | **Dashboard com gráficos** | Gráfico de barras mensal e rosca por categoria via Chart.js |
+| 📄 | **Exportação em PDF** | Relatório filtrado exportável (gerado com xhtml2pdf) |
+| 🔒 | **Isolamento por usuário** | Cada usuário acessa somente os próprios dados |
+| 🛡️ | **Admin restrito** | Painel Django Admin disponível apenas para `is_superuser=True` |
+| 🕓 | **Histórico de alterações** | `django-simple-history` registra todo o histórico de edições |
+
+---
+
+## 🧰 Stack e Pacotes
+
+### Backend & Framework
+
+| Pacote | Versão | Para que serve |
+|---|:---:|---|
+| 🐍 **Python** | 3.x | Linguagem principal do projeto |
+| 🎸 **Django** | 6.0.3 | Framework web MVC — views, models, ORM e admin |
+| 🗄️ **SQLite** | — | Banco de dados local (sem configuração extra) |
+| `asgiref` | 3.11.1 | Suporte ASGI/WSGI para o Django |
+| `sqlparse` | 0.5.5 | Formatação de queries SQL (dependência interna do Django) |
+| `tzdata` | 2025.3 | Dados de fuso horário para ambientes Windows |
+
+### Funcionalidades e Utilitários
+
+| Pacote | Versão | Para que serve |
+|---|:---:|---|
+| 📜 **django-simple-history** | 3.11.0 | Registra histórico de todas as alterações nos models |
+| 🔑 **python-decouple** | 3.8 | Lê variáveis sensíveis do `.env` (SECRET_KEY, DEBUG…) |
+| 🖼️ **Pillow** | 12.1.1 | Processamento de imagens (dependência do xhtml2pdf) |
+
+### Geração de PDF
+
+| Pacote | Versão | Para que serve |
+|---|:---:|---|
+| 📑 **xhtml2pdf** | 0.2.17 | Converte HTML/CSS em PDF para exportação de relatórios |
+| `reportlab` | 4.4.10 | Motor de renderização PDF (base do xhtml2pdf) |
+| `pypdf` | 6.9.2 | Manipulação de arquivos PDF já gerados |
+| `html5lib` | 1.1 | Parser HTML5 utilizado pelo xhtml2pdf |
+
+### Frontend (via CDN)
+
+| Biblioteca | Versão | Para que serve |
+|---|:---:|---|
+| 🎨 **Bootstrap** | 5 | Layout responsivo, componentes e utilitários CSS |
+| 📊 **Chart.js** | 4.4.0 | Gráficos interativos no dashboard (barras e rosca) |
+
+---
+
+## 🏗️ Arquitetura
+
+O projeto segue uma **arquitetura em camadas por domínio**, garantindo separação clara de responsabilidades e facilitando manutenção e testes.
+
+```
+View  →  Business  →  Rules
+               ↓
+            Helper
+```
+
+Cada domínio (ex: `Financeiro`) contém seus próprios arquivos de camada:
 
 ```
 Domínio (ex: Financeiro)/
   app (ex: lancamentos)/
-    models.py       ← Herda BasicModel + mixins de composição
-    views.py        ← Herda BasicView; SÓ lida com request/response
-    business.py     ← Processamento, regras e tratamento de erros
-    helpers.py      ← Queries reutilizáveis, funções auxiliares sem escrita
-    rules.py        ← Regras de negócio; retorna False ou lança exceção
-    forms.py
-    urls.py
-    admin.py
-    tests.py
+    models.py    ← Herda BasicModel + mixins de composição
+    views.py     ← Herda BasicView; SÓ lida com request/response
+    business.py  ← Orquestra o fluxo, chama Rules/Helper, usa transaction.atomic()
+    helpers.py   ← Queries reutilizáveis, funções auxiliares sem escrita no banco
+    rules.py     ← Valida regras de negócio; lança exceções ou retorna False
+    forms.py     ← Formulários Django ligados aos models
+    urls.py      ← Rotas do domínio com namespace
+    admin.py     ← Configuração do Django Admin
+    tests.py     ← Suite de testes cobrindo todas as camadas
 ```
 
-### Camadas
+### Responsabilidades de cada camada
 
-| Camada | Responsabilidade |
-|---|---|
-| **View** | Recebe request, chama Business, retorna response. Sem regra de negócio. |
-| **Business** | Orquestra o fluxo, processa dados, chama Rules e Helper. |
-| **Rules** | Valida regras de negócio. Lança `BusinessRulesExceptions` ou retorna `False`. |
-| **Helper** | Queries complexas reutilizáveis e funções auxiliares (sem escrita). |
+| Camada | Arquivo | O que faz |
+|:---:|---|---|
+| 🌐 **View** | `views.py` | Recebe a requisição, chama o Business e devolve a resposta. Zero lógica de negócio aqui. |
+| ⚙️ **Business** | `business.py` | Orquestra o fluxo completo, chama Rules e Helper, e encapsula tudo em `transaction.atomic()`. |
+| ✅ **Rules** | `rules.py` | Garante que as regras de negócio são respeitadas. Lança `BusinessRulesExceptions` ou retorna `False`. |
+| 🔎 **Helper** | `helpers.py` | Queries complexas e reutilizáveis — somente leitura, sem efeitos colaterais. |
 
-### Exceções
+### Tratamento de Exceções
 
-| Exceção | Lançada por | HTTP |
-|---|---|---|
-| `BusinessRulesExceptions` | Rules | 400 |
-| `ProcessException` | Business (erro tratado) | 400 |
-| `SystemErrorException` | Business (erro inesperado) | 500 |
+| Exceção | Quando é lançada | HTTP resultante |
+|---|---|:---:|
+| `BusinessRulesExceptions` | Regra de negócio violada (ex: valor negativo) | **400** |
+| `ProcessException` | Erro tratado pelo Business (ex: categoria já existe) | **400** |
+| `SystemErrorException` | Erro inesperado — capturado no `except Exception` | **500** |
 
 ---
 
-## Estrutura de Pastas
+## 📁 Estrutura de Pastas
 
 ```
-hackathon/           ← Configurações do projeto Django
-core/                ← Classes base, exceções, mixins, constantes técnicas
-common/              ← Constantes de texto, widgets personalizados
-Financeiro/          ← Domínio financeiro (app: lancamentos)
-Usuario/             ← Domínio de usuário (app: autenticacao)
-templates/           ← Templates HTML organizados por app
-  base.html          ← Layout raiz (público: login, landing)
-  base_auth.html     ← Layout autenticado com sidebar (extends base.html)
-  core/              ← Páginas de erro (400, 403, 404, 500)
-static/              ← Assets estáticos (CSS, JS, imagens)
+hackathon/           ← ⚙️  Configurações do projeto (settings, urls, wsgi, asgi)
+core/                ← 🧱  Classes base, exceções, mixins e constantes técnicas
+common/              ← 📦  Constantes de texto reutilizáveis e widgets personalizados
+Financeiro/          ← 💰  Domínio financeiro (app: lancamentos)
+Usuario/             ← 👤  Domínio de usuário (app: autenticacao)
+templates/           ← 🎨  Templates HTML organizados por domínio/app
+  base.html          ─── Layout raiz (landing, login)
+  base_auth.html     ─── Layout autenticado com sidebar (extends base.html)
+  core/              ─── Páginas de erro personalizadas (400, 403, 404, 500)
+static/              ← 🗂️  Arquivos estáticos (CSS, JS, imagens)
+docs/                ← 📊  Diagramas e documentação técnica
 manage.py
 requirements.txt
 .env-example
@@ -122,163 +172,178 @@ requirements.txt
 
 ---
 
-## Como Executar
+## 🚀 Como Executar
 
-### 1. Clonar o repositório
+Siga os passos abaixo para ter o projeto rodando localmente em poucos minutos.
+
+### 1️⃣ Clone o repositório
 
 ```bash
 git clone <url-do-repositorio>
 cd hackathon
 ```
 
-### 2. Criar e ativar o ambiente virtual
+### 2️⃣ Crie e ative o ambiente virtual
 
 ```bash
 python -m venv venv
+
 # Windows
 venv\Scripts\activate
-# Linux/macOS
+
+# Linux / macOS
 source venv/bin/activate
 ```
 
-### 3. Instalar dependências
+### 3️⃣ Instale as dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configurar variáveis de ambiente
+### 4️⃣ Configure as variáveis de ambiente
 
 ```bash
 cp .env-example .env
-# Edite o .env com sua SECRET_KEY e demais configurações
+# Abra o .env e preencha a SECRET_KEY e demais configurações
 ```
 
-### 5. Executar as migrações
+### 5️⃣ Execute as migrações
 
 ```bash
 python manage.py migrate
 ```
 
-### 6. Criar um superusuário (opcional)
+### 6️⃣ Crie um superusuário *(opcional)*
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### 7. Popular dados de demonstração (opcional)
+### 7️⃣ Popule dados de demonstração *(opcional)*
 
 ```bash
 python manage.py seed_demo
 ```
 
-### 8. Iniciar o servidor
+### 8️⃣ Suba o servidor
 
 ```bash
 python manage.py runserver
 ```
 
-Acesse em: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+> 🌐 Acesse em **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
 ---
 
-## Variáveis de Ambiente
+## ⚙️ Variáveis de Ambiente
 
-Copie `.env-example` para `.env` e preencha:
+Copie `.env-example` para `.env` e preencha conforme a tabela abaixo:
 
 | Variável | Descrição | Padrão |
-|---|---|---|
-| `SECRET_KEY` | Chave secreta do Django | — (obrigatório) |
-| `DEBUG` | Modo debug | `True` |
-| `ALLOWED_HOSTS` | Hosts permitidos (separados por vírgula) | `127.0.0.1,localhost` |
+|---|---|:---:|
+| `SECRET_KEY` | 🔑 Chave secreta do Django — **obrigatória** | — |
+| `DEBUG` | 🐛 Ativa o modo debug (desative em produção) | `True` |
+| `ALLOWED_HOSTS` | 🌍 Hosts permitidos, separados por vírgula | `127.0.0.1,localhost` |
+
+> ⚠️ **Nunca** versione o arquivo `.env` nem exponha a `SECRET_KEY` publicamente.
 
 ---
 
-## Comandos Úteis
+## 🛣️ Rotas Principais
+
+| Método | URL | Nome | Descrição |
+|:---:|---|---|---|
+| `GET` | `/` | `landing` | 🏠 Landing page pública |
+| `GET/POST` | `/login/` | `usuario:login` | 🔐 Login |
+| `POST` | `/logout/` | `usuario:logout` | 🚪 Logout |
+| `GET` | `/financeiro/` | `financeiro:dashboard` | 📊 Dashboard financeiro |
+| `GET` | `/financeiro/lancamentos/` | `financeiro:lancamento-lista` | 📋 Lista de lançamentos |
+| `GET/POST` | `/financeiro/lancamentos/novo/` | `financeiro:lancamento-criar` | ➕ Criar lançamento |
+| `GET/POST` | `/financeiro/lancamentos/<pk>/editar/` | `financeiro:lancamento-editar` | ✏️ Editar lançamento |
+| `POST` | `/financeiro/lancamentos/<pk>/excluir/` | `financeiro:lancamento-excluir` | 🗑️ Excluir (AJAX) |
+| `GET` | `/financeiro/categorias/` | `financeiro:categoria-lista` | 🏷️ Lista de categorias |
+| `GET/POST` | `/financeiro/categorias/nova/` | `financeiro:categoria-criar` | ➕ Criar categoria |
+| `GET/POST` | `/financeiro/categorias/<pk>/editar/` | `financeiro:categoria-editar` | ✏️ Editar categoria |
+| `POST` | `/financeiro/categorias/<pk>/excluir/` | `financeiro:categoria-excluir` | 🗑️ Excluir (AJAX) |
+| `GET` | `/financeiro/relatorio/` | `financeiro:relatorio` | 📄 Relatório com filtros |
+| `GET` | `/financeiro/relatorio/pdf/` | `financeiro:relatorio-pdf` | ⬇️ Download PDF |
+| `GET` | `/admin/` | — | 🛡️ Django Admin (superusuários) |
+
+---
+
+## 🧪 Testes
 
 ```bash
-# Rodar servidor de desenvolvimento
-python manage.py runserver
-
-# Criar migrações
-python manage.py makemigrations
-
-# Aplicar migrações
-python manage.py migrate
-
-# Criar superusuário
-python manage.py createsuperuser
-
-# Popular dados de demonstração
-python manage.py seed_demo
-
-# Rodar testes
+# Rodar toda a suite de testes
 python manage.py test
 
-# Coletar arquivos estáticos
+# Rodar apenas os testes do módulo financeiro, com detalhes
+python manage.py test Financeiro.lancamentos --verbosity=2
+```
+
+A suite de testes cobre os seguintes cenários:
+
+| Área | O que é testado |
+|---|---|
+| 🔐 **Autenticação** | Redirecionamento para login em todas as rotas protegidas |
+| 📊 **DashboardView** | Acesso, template correto e contexto (saldo, gráfico, últimos lançamentos) |
+| 📋 **LancamentoListView** | Listagem, filtros ativos, AJAX partial e isolamento de dados entre usuários |
+| ➕ **LancamentoCreateView** | GET/POST, redirecionamento após criação e isolamento |
+| ✏️ **LancamentoUpdateView** | Edição completa e proteção contra acesso cruzado |
+| 🗑️ **LancamentoDeleteView** | Resposta JSON de sucesso e isolamento de exclusão |
+| 🏷️ **CategoriaListView / CreateView / UpdateView** | CRUD completo de categorias |
+| 🗑️ **CategoriaDeleteView** | Exclusão com e sem lançamentos vinculados, isolamento |
+| 📄 **RelatorioView** | Acesso, filtros e isolamento |
+| 📑 **RelatorioPDFView** | Status HTTP 200 e `Content-Type: application/pdf` |
+
+---
+
+## 🔧 Comandos Úteis
+
+```bash
+# 🚀 Iniciar o servidor de desenvolvimento
+python manage.py runserver
+
+# 📐 Criar novas migrações após alterar models
+python manage.py makemigrations
+
+# 🗄️ Aplicar migrações ao banco
+python manage.py migrate
+
+# 👤 Criar superusuário para o admin
+python manage.py createsuperuser
+
+# 🌱 Popular banco com dados de demonstração
+python manage.py seed_demo
+
+# 🧪 Rodar todos os testes automatizados
+python manage.py test
+
+# 📦 Coletar arquivos estáticos para produção
 python manage.py collectstatic
 
-# Verificar saúde do projeto
+# 🩺 Verificar saúde geral do projeto
 python manage.py check
 ```
 
 ---
 
-## Testes
+## 👥 Usuários de Demonstração
 
-```bash
-# Rodar todos os testes
-python manage.py test
+Após executar `python manage.py seed_demo`, dois usuários de teste ficam disponíveis com dados pré-carregados:
 
-# Rodar testes do módulo financeiro com saída detalhada
-python manage.py test Financeiro.lancamentos --verbosity=2
-```
+| Usuário | Senha | Conteúdo |
+|:---:|:---:|---|
+| `demo1` | `demo1234` | 10 categorias + ~45 lançamentos variados |
+| `demo2` | `demo1234` | 10 categorias + ~45 lançamentos variados |
 
-A suite de testes cobre:
-
-- Autenticação: redirecionamento para login em rotas protegidas
-- `DashboardView`: acesso, template, context (saldo, gráfico, últimos)
-- `LancamentoListView`: listagem, filtros, AJAX partial, isolamento de dados
-- `LancamentoCreateView` / `UpdateView`: GET/POST, redirecionamento, isolamento
-- `LancamentoDeleteView`: resposta JSON, isolamento
-- `CategoriaListView` / `CreateView` / `UpdateView`: CRUD completo
-- `CategoriaDeleteView`: exclusão com e sem lançamentos vinculados, isolamento
-- `RelatorioView`: acesso, filtros, isolamento
-- `RelatorioPDFView`: status 200, `Content-Type: application/pdf`
+> 🔒 Os dados de `demo1` e `demo2` são **completamente isolados** entre si — nenhum usuário enxerga os dados do outro.
 
 ---
 
-## Rotas Principais
+<div align="center">
 
-| Método | URL | Nome | Descrição |
-|---|---|---|---|
-| GET | `/` | `landing` | Landing page pública |
-| GET/POST | `/login/` | `usuario:login` | Login |
-| POST | `/logout/` | `usuario:logout` | Logout |
-| GET | `/financeiro/` | `financeiro:dashboard` | Dashboard |
-| GET | `/financeiro/lancamentos/` | `financeiro:lancamento-lista` | Lista de lançamentos |
-| GET/POST | `/financeiro/lancamentos/novo/` | `financeiro:lancamento-criar` | Criar lançamento |
-| GET/POST | `/financeiro/lancamentos/<pk>/editar/` | `financeiro:lancamento-editar` | Editar lançamento |
-| POST | `/financeiro/lancamentos/<pk>/excluir/` | `financeiro:lancamento-excluir` | Excluir (AJAX) |
-| GET | `/financeiro/categorias/` | `financeiro:categoria-lista` | Lista de categorias |
-| GET/POST | `/financeiro/categorias/nova/` | `financeiro:categoria-criar` | Criar categoria |
-| GET/POST | `/financeiro/categorias/<pk>/editar/` | `financeiro:categoria-editar` | Editar categoria |
-| POST | `/financeiro/categorias/<pk>/excluir/` | `financeiro:categoria-excluir` | Excluir (AJAX) |
-| GET | `/financeiro/relatorio/` | `financeiro:relatorio` | Relatório com filtros |
-| GET | `/financeiro/relatorio/pdf/` | `financeiro:relatorio-pdf` | Download PDF |
-| GET | `/admin/` | — | Django Admin (superusuários) |
+Feito com ☕ e muito Python · Hackathon Ctrl+Alt+AI · M2A / IntGest
 
----
-
-## Usuários de Demonstração
-
-Após executar `python manage.py seed_demo`, os seguintes usuários ficam disponíveis:
-
-| Usuário | Senha | Descrição |
-|---|---|---|
-| `demo1` | `demo1234` | Usuário A com 10 categorias e ~45 lançamentos |
-| `demo2` | `demo1234` | Usuário B com 10 categorias e ~45 lançamentos |
-
-Os dados são completamente isolados entre os dois usuários.
-
----
+</div>

@@ -21,8 +21,8 @@ urlpatterns = [
     path("", LandingPageView.as_view(), name="landing"),
     # Módulo de autenticação (namespace "usuario")
     path("", include("Usuario.autenticacao.urls")),
-    # Módulo Financeiro — será ativado no Passo 3
-    # path("financeiro/", include("Financeiro.lancamentos.urls")),
+    # Módulo Financeiro
+    path("financeiro/", include("Financeiro.lancamentos.urls")),
 ]
 
 # ─── Handlers de erro personalizados ────────────────────────────────────────

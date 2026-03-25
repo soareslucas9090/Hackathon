@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "simple_history",
     # Projeto
     "Usuario.autenticacao",
+    "Financeiro.lancamentos",
 ]
 
 MIDDLEWARE = [

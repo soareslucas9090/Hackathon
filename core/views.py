@@ -28,6 +28,7 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
+    TemplateView,
     UpdateView,
     View,
 )
@@ -92,6 +93,10 @@ class ExceptionHandlerMixin:
         return render(request, "core/500.html", {"error": exc.message}, status=500)
 
 
+class BasicTemplateView(LoginRequiredMixin, ExceptionHandlerMixin, TemplateView):
+    """View base para templates simples protegidas por login."""
+
+
 class BasicDetailView(LoginRequiredMixin, ExceptionHandlerMixin, DetailView):
     """
     View base para exibição de detalhe de um objeto.
@@ -137,9 +142,13 @@ class BasicDeleteView(LoginRequiredMixin, ExceptionHandlerMixin, DeleteView):
     """
 
 
-class BasicActionView(LoginRequiredMixin, ExceptionHandlerMixin, View):
+class BasicActionView(LoginRequiredMixin, View):
     """
     View base para ações executadas via AJAX (ex.: exclusão dinâmica em tabela).
+
+    Herda apenas de ``LoginRequiredMixin`` e ``View`` — NÃO herda de
+    ``ExceptionHandlerMixin`` para que as exceções sejam convertidas em JSON
+    e não em páginas HTML de erro.
 
     Sempre retorna JSON. Em caso de sucesso, retorna ``{"success": true}``.
     Em caso de erro, retorna ``{"success": false, "error": "mensagem"}``.
@@ -175,13 +184,13 @@ class BasicActionView(LoginRequiredMixin, ExceptionHandlerMixin, View):
                 "Erro inesperado. Contate o suporte.", status=500
             )
 
-    def json_success(self, data: dict = None, status: int = 200) -> JsonResponse:
+    def json_success(self, data=None, status=200):
         """Retorna uma resposta JSON de sucesso."""
         payload = {"success": True}
         if data:
             payload.update(data)
         return JsonResponse(payload, status=status)
 
-    def json_error(self, message: str, status: int = 400) -> JsonResponse:
+    def json_error(self, message, status=400):
         """Retorna uma resposta JSON de erro."""
         return JsonResponse({"success": False, "error": message}, status=status)

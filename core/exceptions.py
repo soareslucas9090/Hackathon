@@ -24,7 +24,7 @@ class BusinessRulesExceptions(Exception):
                 return False
     """
 
-    def __init__(self, message: str = "Regra de negócio violada."):
+    def __init__(self, message="Regra de negócio violada."):
         self.message = message
         super().__init__(self.message)
 
@@ -46,7 +46,7 @@ class ProcessException(Exception):
                     raise ProcessException(str(e)) from e
     """
 
-    def __init__(self, message: str = "Erro no processamento da operação."):
+    def __init__(self, message="Erro no processamento da operação."):
         self.message = message
         super().__init__(self.message)
 
@@ -68,6 +68,6 @@ class SystemErrorException(Exception):
                     raise SystemErrorException(str(e)) from e
     """
 
-    def __init__(self, message: str = "Erro inesperado no sistema. Contate o suporte."):
+    def __init__(self, message="Erro inesperado no sistema. Contate o suporte."):
         self.message = message
         super().__init__(self.message)

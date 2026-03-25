@@ -25,13 +25,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{% url 'financeiro:receita-lista' %}"
+                <a href="{% url 'financeiro:lancamento-lista' %}?tipo=receita"
                    class="nav-link text-white {% block nav_receitas %}{% endblock %}">
                     <i class="bi bi-arrow-up-circle me-2" style="color:#22c55e;"></i> Receitas
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{% url 'financeiro:despesa-lista' %}"
+                <a href="{% url 'financeiro:lancamento-lista' %}?tipo=despesa"
                    class="nav-link text-white {% block nav_despesas %}{% endblock %}">
                     <i class="bi bi-arrow-down-circle me-2" style="color:#ef4444;"></i> Despesas
                 </a>

@@ -217,6 +217,8 @@ A documentação deverá ser um dos pilares do sistema, e também será uma prio
 
 Uma coisa muito importante é seguir os padrões gerais de programação, git, do python e do django. Use a documentação do python e do django como referência de boas práticas: https://docs.python.org/3/, https://docs.djangoproject.com/pt-br/6.0/ e https://django-best-practices.readthedocs.io/en/latest/.
 
+**NÃO USE type hints** em nenhum arquivo Python do projeto. Não anote tipos em parâmetros, variáveis nem retornos de funções (`->` proibido). O código deve ser limpo e legível sem anotações de tipo.
+
 As skill do sistema deverão seguir as práticas de commits (os commits não precisam subir, apenas serem feitos) semânticos e atômicos, deixando a atomicidade para cada conjunto de código que realiza uma função fechada.
 
 Deve ser criado um .gitignore antes do primeiro commit.

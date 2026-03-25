@@ -1,0 +1,73 @@
+{% extends "base_auth.html" %}
+
+{% block content %}
+<!-- Filtros -->
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <form method="get" id="form-filtros" class="row g-2 align-items-end">
+      <div class="col-12 col-md-3">
+        <label class="form-label small">Tipo</label>
+        <select name="tipo" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          <option value="receita" {% if filtros.tipo == "receita" %}selected{% endif %}>Receita</option>
+          <option value="despesa" {% if filtros.tipo == "despesa" %}selected{% endif %}>Despesa</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label small">Categoria</label>
+        <select name="categoria" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for cat in categorias %}
+          <option value="{{ cat.pk }}" {% if filtros.categoria == cat.pk|stringformat:"s" %}selected{% endif %}>
+            {{ cat.nome }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small">De</label>
+        <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ filtros.data_inicio }}">
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small">Até</label>
+        <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ filtros.data_fim }}">
+      </div>
+      <div class="col-12 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-sm btn-primary flex-fill">
+          <i class="bi bi-funnel"></i> Filtrar
+        </button>
+        <a href="{% url 'financeiro:lancamento-lista' %}" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-x"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Ações -->
+<div class="d-flex justify-content-end mb-3">
+  <a href="{% url 'financeiro:lancamento-criar' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Novo Lançamento
+  </a>
+</div>
+
+<!-- Tabela (refreshável via AJAX) -->
+<div id="tabela-lancamentos">
+  {% include "financeiro/lancamentos/partials/lancamento_tabela.html" %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById("form-filtros").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const params = new URLSearchParams(new FormData(this));
+  fetch("{% url 'financeiro:lancamento-lista' %}?" + params.toString(), {
+    headers: { "X-Requested-With": "XMLHttpRequest" }
+  })
+    .then(r => r.text())
+    .then(html => { document.getElementById("tabela-lancamentos").innerHTML = html; })
+    .catch(() => this.submit());
+});
+</script>
+{% endblock %}

@@ -104,3 +104,26 @@ class RulesModelMixin:
         if not self._rules:
             self._rules = self._get_rules_class()
         return self._rules
+
+
+# ─── Bases para as camadas de domínio ────────────────────────────────────────
+
+class ModelBusiness:
+    """Classe base para a camada de Business de um model."""
+
+    def __init__(self, model_instance):
+        self.model_instance = model_instance
+
+
+class ModelRules:
+    """Classe base para a camada de Rules de um model."""
+
+    def __init__(self, model_instance):
+        self.model_instance = model_instance
+
+
+class ModelHelper:
+    """Classe base para a camada de Helper de um model."""
+
+    def __init__(self, model_instance):
+        self.model_instance = model_instance

@@ -41,7 +41,7 @@ class Categoria(BasicModel, BusinessModelMixin, HelperModelMixin, RulesModelMixi
     )
     usuario = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="categorias",
         verbose_name="Usuário",
     )
@@ -97,7 +97,7 @@ class Lancamento(BasicModel, BusinessModelMixin, HelperModelMixin, RulesModelMix
     )
     usuario = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="lancamentos",
         verbose_name="Usuário",
     )

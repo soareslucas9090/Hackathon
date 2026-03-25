@@ -32,6 +32,7 @@ Projeto desenvolvido para o Hackathon **Ctrl+Alt+AI: Hackeando a Rotina de Progr
 - Toda consulta com relacionamentos deve usar `select_related` / `prefetch_related`.
 - Toda operação de escrita no Business deve estar dentro de `transaction.atomic()`.
 - **SEMPRE** leia o arquivo architecture-rules.md e siga-o para quaisquer alterações e análises.
+- **NUNCA** instanciar um Helper, Rules ou Business manualmente, assim como **NUNCA** criar métodos estáticos em Helpers, Rules ou Business
 ---
 
 ## Arquitetura em Camadas

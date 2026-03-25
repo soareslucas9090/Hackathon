@@ -43,17 +43,20 @@ View → Business → Rules
 - Todo método de escrita está dentro de `transaction.atomic()`.
 - Exceções tratadas com o padrão obrigatório (ver abaixo).
 - Chama `Rules` antes de `save()`.
+- Nunca instanciar manualmente ou criar métodos estáticos.
 
 ### Rules
 - Herda `ModelRules` (`core.mixins`).
 - Retorna `False` quando a regra é atendida.
 - Lança `BusinessRulesExceptions` quando a regra é violada.
 - **Nunca** persiste dados.
+- Nunca instanciar manualmente ou criar métodos estáticos.
 
 ### Helper
 - Herda `ModelHelper` (`core.mixins`).
 - Contém apenas métodos `@staticmethod` de leitura.
 - **Nunca** grava dados nem lança exceções de negócio.
+- Nunca instanciar manualmente ou criar métodos estáticos.
 
 ### Exceções — Padrão Obrigatório no Business
 

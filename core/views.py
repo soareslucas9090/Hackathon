@@ -188,7 +188,10 @@ class BasicActionView(LoginRequiredMixin, View):
         """Retorna uma resposta JSON de sucesso."""
         payload = {"success": True}
         if data:
-            payload.update(data)
+            if isinstance(data, dict):
+                payload.update(data)
+            else:
+                payload["message"] = data
         return JsonResponse(payload, status=status)
 
     def json_error(self, message, status=400):

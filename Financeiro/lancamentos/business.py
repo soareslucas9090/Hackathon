@@ -48,7 +48,7 @@ class CategoriaBusiness(ModelBusiness):
         """Remove a Categoria se ela não possuir lançamentos vinculados."""
         try:
             with transaction.atomic():
-                if self.model_instance.lancamento_set.exists():
+                if self.model_instance.lancamentos.exists():
                     raise ProcessException(
                         "Não é possível excluir uma categoria que possui lançamentos."
                     )

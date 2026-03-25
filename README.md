@@ -1,18 +1,23 @@
 # Gestão Financeira Pessoal
 
-Sistema web para controle de finanças pessoais, desenvolvido em Django com arquitetura em camadas como parte do Hackathon **Ctrl+Alt+AI: Hackeando a Rotina de Programação**.
+Sistema web para controle de finanças pessoais, desenvolvido em Django com arquitetura em camadas como parte do Hackathon **Ctrl+Alt+AI: Hackeando a Rotina de Programação** (M2A / IntGest).
 
 ---
 
 ## Sumário
 
 - [Objetivo](#objetivo)
+- [Funcionalidades](#funcionalidades)
 - [Stack](#stack)
 - [Arquitetura](#arquitetura)
 - [Estrutura de Pastas](#estrutura-de-pastas)
 - [Como Executar](#como-executar)
 - [Variáveis de Ambiente](#variáveis-de-ambiente)
+- [Rotas Principais](#rotas-principais)
+- [Testes](#testes)
 - [Comandos Úteis](#comandos-úteis)
+- [Usuários de Demonstração](#usuários-de-demonstração)
+- [Diagramas](docs/diagramas.md)
 
 ---
 
@@ -22,20 +27,41 @@ Prova de Conceito de um mini software de **Gestão Financeira Pessoal** que perm
 
 - Registrar receitas e despesas com categorias.
 - Visualizar saldo atualizado automaticamente.
-- Ver um dashboard com resumo financeiro.
+- Ver um dashboard com resumo financeiro e gráficos.
 - Gerenciar lançamentos (criar, editar, excluir) com dados isolados por usuário.
+- Exportar relatórios filtrados em PDF.
+
+---
+
+## Funcionalidades
+
+| # | Funcionalidade | Descrição |
+|---|---|---|
+| 1 | Cadastro de receitas | Crie entradas financeiras com categoria, data e valor |
+| 2 | Cadastro de despesas | Crie saídas financeiras com categoria, data e valor |
+| 3 | Categorias personalizadas | Crie, edite e exclua categorias com cor e nome únicos por usuário |
+| 4 | Listagem com filtros | Filtre lançamentos por tipo, categoria, período e busca textual |
+| 5 | Saldo automático | Receitas − Despesas calculadas em tempo real |
+| 6 | Dashboard com gráficos | Gráfico de barras mensal e gráfico de rosca por categoria |
+| 7 | Relatório com exportação PDF | Relatório filtrado exportável via xhtml2pdf |
+| 8 | Isolamento por usuário | Cada usuário vê somente seus próprios dados |
+| 9 | Admin restrito a superusuários | Painel Django Admin disponível apenas para `is_superuser=True` |
+| 10 | Histórico de alterações | django-simple-history registra todo histórico de edições |
 
 ---
 
 ## Stack
 
-| Tecnologia | Versão |
-|---|---|
-| Python | 3.x |
-| Django | 6.0.3 |
-| SQLite | — |
-| django-simple-history | 3.11.0 |
-| python-decouple | 3.8 |
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| Python | 3.x | Linguagem principal |
+| Django | 6.0.3 | Framework web |
+| SQLite | — | Banco de dados local |
+| django-simple-history | 3.11.0 | Histórico de alterações nos models |
+| python-decouple | 3.8 | Gerenciamento de variáveis de ambiente |
+| xhtml2pdf | 0.2.17 | Exportação de relatórios em PDF |
+| Bootstrap | 5 CDN | Interface responsiva |
+| Chart.js | 4.4.0 CDN | Gráficos no dashboard |
 
 ---
 
@@ -170,14 +196,29 @@ Copie `.env-example` para `.env` e preencha:
 ## Comandos Úteis
 
 ```bash
+# Rodar servidor de desenvolvimento
+python manage.py runserver
+
+# Criar migrações
+python manage.py makemigrations
+
+# Aplicar migrações
+python manage.py migrate
+
+# Criar superusuário
+python manage.py createsuperuser
+
+# Popular dados de demonstração
+python manage.py seed_demo
+
 # Rodar testes
 python manage.py test
 
-# Gerar dados de demonstração
-python manage.py seed_demo
-
 # Coletar arquivos estáticos
 python manage.py collectstatic
+
+# Verificar saúde do projeto
+python manage.py check
 ```
 
 ---
@@ -185,7 +226,58 @@ python manage.py collectstatic
 ## Testes
 
 ```bash
+# Rodar todos os testes
 python manage.py test
+
+# Rodar testes do módulo financeiro com saída detalhada
+python manage.py test Financeiro.lancamentos --verbosity=2
 ```
 
-Os testes cobrem as Views principais do sistema.
+A suite de testes cobre:
+
+- Autenticação: redirecionamento para login em rotas protegidas
+- `DashboardView`: acesso, template, context (saldo, gráfico, últimos)
+- `LancamentoListView`: listagem, filtros, AJAX partial, isolamento de dados
+- `LancamentoCreateView` / `UpdateView`: GET/POST, redirecionamento, isolamento
+- `LancamentoDeleteView`: resposta JSON, isolamento
+- `CategoriaListView` / `CreateView` / `UpdateView`: CRUD completo
+- `CategoriaDeleteView`: exclusão com e sem lançamentos vinculados, isolamento
+- `RelatorioView`: acesso, filtros, isolamento
+- `RelatorioPDFView`: status 200, `Content-Type: application/pdf`
+
+---
+
+## Rotas Principais
+
+| Método | URL | Nome | Descrição |
+|---|---|---|---|
+| GET | `/` | `landing` | Landing page pública |
+| GET/POST | `/login/` | `usuario:login` | Login |
+| POST | `/logout/` | `usuario:logout` | Logout |
+| GET | `/financeiro/` | `financeiro:dashboard` | Dashboard |
+| GET | `/financeiro/lancamentos/` | `financeiro:lancamento-lista` | Lista de lançamentos |
+| GET/POST | `/financeiro/lancamentos/novo/` | `financeiro:lancamento-criar` | Criar lançamento |
+| GET/POST | `/financeiro/lancamentos/<pk>/editar/` | `financeiro:lancamento-editar` | Editar lançamento |
+| POST | `/financeiro/lancamentos/<pk>/excluir/` | `financeiro:lancamento-excluir` | Excluir (AJAX) |
+| GET | `/financeiro/categorias/` | `financeiro:categoria-lista` | Lista de categorias |
+| GET/POST | `/financeiro/categorias/nova/` | `financeiro:categoria-criar` | Criar categoria |
+| GET/POST | `/financeiro/categorias/<pk>/editar/` | `financeiro:categoria-editar` | Editar categoria |
+| POST | `/financeiro/categorias/<pk>/excluir/` | `financeiro:categoria-excluir` | Excluir (AJAX) |
+| GET | `/financeiro/relatorio/` | `financeiro:relatorio` | Relatório com filtros |
+| GET | `/financeiro/relatorio/pdf/` | `financeiro:relatorio-pdf` | Download PDF |
+| GET | `/admin/` | — | Django Admin (superusuários) |
+
+---
+
+## Usuários de Demonstração
+
+Após executar `python manage.py seed_demo`, os seguintes usuários ficam disponíveis:
+
+| Usuário | Senha | Descrição |
+|---|---|---|
+| `demo1` | `demo1234` | Usuário A com 10 categorias e ~45 lançamentos |
+| `demo2` | `demo1234` | Usuário B com 10 categorias e ~45 lançamentos |
+
+Os dados são completamente isolados entre os dois usuários.
+
+---

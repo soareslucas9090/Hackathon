@@ -2,6 +2,7 @@
 from decimal import Decimal
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from common.widgets import DatePickerInput, MoneyInput
 
@@ -50,6 +51,11 @@ class LancamentoForm(forms.ModelForm):
 
     def __init__(self, *args, usuario=None, taxa_moeda=None, **kwargs):
         super().__init__(*args, **kwargs)
+
+        verbose_original = self.instance._meta.get_field('valor').verbose_name
+
+        self.fields['valor'].label = f"{verbose_original} ()"
+
         self.usuario = usuario
         self.taxa_moeda = Decimal(str(taxa_moeda)) if taxa_moeda is not None else Decimal("1")
         if usuario:
@@ -92,7 +98,7 @@ class LancamentoForm(forms.ModelForm):
                 valor = Decimal(valor)
             except InvalidOperation:
                 from django.core.exceptions import ValidationError
-                raise ValidationError("Informe um valor monetário válido.")
+                raise ValidationError(_("Informe um valor monetário válido."))
         # Converte da moeda do usuário para BRL
         if valor and self.taxa_moeda and self.taxa_moeda != Decimal("1"):
             valor = (valor * self.taxa_moeda).quantize(Decimal("0.01"))

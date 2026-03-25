@@ -8,6 +8,7 @@ Responsabilidade: orquestrar regras de negócio e persistência.
 - Exceções desconhecidas são encapsuladas em SystemErrorException.
 """
 from django.db import transaction
+from django.utils.translation import gettext as _
 
 from core.exceptions import BusinessRulesExceptions, ProcessException, SystemErrorException
 from core.mixins import ModelBusiness
@@ -27,7 +28,7 @@ class CategoriaBusiness(ModelBusiness):
             raise
         except Exception as exc:
             raise SystemErrorException(
-                "Erro inesperado ao criar categoria."
+                _("Erro inesperado ao criar categoria.")
             ) from exc
 
     def atualizar(self):
@@ -41,7 +42,7 @@ class CategoriaBusiness(ModelBusiness):
             raise
         except Exception as exc:
             raise SystemErrorException(
-                "Erro inesperado ao atualizar categoria."
+                _("Erro inesperado ao atualizar categoria.")
             ) from exc
 
     def excluir(self):
@@ -50,14 +51,14 @@ class CategoriaBusiness(ModelBusiness):
             with transaction.atomic():
                 if self.model_instance.lancamentos.exists():
                     raise ProcessException(
-                        "Não é possível excluir uma categoria que possui lançamentos."
+                        _("Não é possível excluir uma categoria que possui lançamentos.")
                     )
                 self.model_instance.delete()
         except (BusinessRulesExceptions, ProcessException):
             raise
         except Exception as exc:
             raise SystemErrorException(
-                "Erro inesperado ao excluir categoria."
+                _("Erro inesperado ao excluir categoria.")
             ) from exc
 
 
@@ -76,7 +77,7 @@ class LancamentoBusiness(ModelBusiness):
             raise
         except Exception as exc:
             raise SystemErrorException(
-                "Erro inesperado ao criar lançamento."
+                _("Erro inesperado ao criar lançamento.")
             ) from exc
 
     def atualizar(self):
@@ -91,7 +92,7 @@ class LancamentoBusiness(ModelBusiness):
             raise
         except Exception as exc:
             raise SystemErrorException(
-                "Erro inesperado ao atualizar lançamento."
+                _("Erro inesperado ao atualizar lançamento.")
             ) from exc
 
     def excluir(self):
@@ -103,5 +104,5 @@ class LancamentoBusiness(ModelBusiness):
             raise
         except Exception as exc:
             raise SystemErrorException(
-                "Erro inesperado ao excluir lançamento."
+                _("Erro inesperado ao excluir lançamento.")
             ) from exc

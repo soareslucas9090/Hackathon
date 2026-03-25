@@ -1,4 +1,5 @@
 {% extends "base_auth.html" %}
+{% load i18n %}
 
 {% block content %}
 <!-- Busca -->
@@ -6,12 +7,12 @@
   <div class="card-body">
     <form method="get" id="form-filtros-cat" class="row g-2 align-items-end">
       <div class="col-12 col-md-6">
-        <label class="form-label small">Buscar categoria</label>
-        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Ex: alimentação..." value="{{ busca }}">
+        <label class="form-label small">{% trans "Buscar categoria" %}</label>
+        <input type="text" name="busca" class="form-control form-control-sm" placeholder="{% trans "Ex: alimentação..." %}" value="{{ busca }}">
       </div>
       <div class="col-12 col-md-3 d-flex gap-2 align-self-end">
         <button type="submit" class="btn btn-sm btn-primary flex-fill">
-          <i class="bi bi-search"></i> Buscar
+          <i class="bi bi-search"></i> {% trans "Buscar" %}
         </button>
         <a href="{% url 'financeiro:categoria-lista' %}" class="btn btn-sm btn-outline-secondary">
           <i class="bi bi-x"></i>
@@ -23,7 +24,7 @@
 
 <div class="d-flex justify-content-end mb-3">
   <a href="{% url 'financeiro:categoria-criar' %}" class="btn btn-primary">
-    <i class="bi bi-plus-lg me-1"></i>Nova Categoria
+    <i class="bi bi-plus-lg me-1"></i>{% trans "Nova Categoria" %}
   </a>
 </div>
 

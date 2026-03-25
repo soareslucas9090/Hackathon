@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import get_template
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 
 from common.constants import (
     MSG_CRIADO_SUCESSO,
@@ -57,7 +58,7 @@ class DashboardView(BasicTemplateView):
         ctx["grafico_cat_valores"] = json.dumps([float(c["total"]) for c in por_cat])
         ctx["grafico_cat_cores"] = json.dumps([c["categoria__cor"] for c in por_cat])
 
-        ctx["page_title"] = "Dashboard"
+        ctx["page_title"] = _("Dashboard")
         return ctx
 
 
@@ -87,7 +88,7 @@ class LancamentoListView(BasicTableView):
         ctx = super().get_context_data(**kwargs)
         ctx["categorias"] = Categoria.objects.filter(usuario=self.request.user).order_by("nome")
         ctx["filtros"] = self.request.GET
-        ctx["page_title"] = "Lançamentos"
+        ctx["page_title"] = _("Lançamentos")
         return ctx
 
 
@@ -112,7 +113,7 @@ class LancamentoCreateView(BasicCreateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["page_title"] = "Novo Lançamento"
+        ctx["page_title"] = _("Novo Lançamento")
         return ctx
 
 
@@ -142,7 +143,7 @@ class LancamentoUpdateView(BasicUpdateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["page_title"] = "Editar Lançamento"
+        ctx["page_title"] = _("Editar Lançamento")
         return ctx
 
 
@@ -174,7 +175,7 @@ class CategoriaListView(BasicTableView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["busca"] = self.request.GET.get("busca", "")
-        ctx["page_title"] = "Categorias"
+        ctx["page_title"] = _("Categorias")
         return ctx
 
 
@@ -198,7 +199,7 @@ class CategoriaCreateView(BasicCreateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["page_title"] = "Nova Categoria"
+        ctx["page_title"] = _("Nova Categoria")
         return ctx
 
 
@@ -227,7 +228,7 @@ class CategoriaUpdateView(BasicUpdateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["page_title"] = "Editar Categoria"
+        ctx["page_title"] = _("Editar Categoria")
         return ctx
 
 
@@ -269,7 +270,7 @@ class RelatorioView(BasicTemplateView):
         ctx["saldo"] = saldo
         ctx["categorias"] = Categoria(usuario=usuario).helper.listar_por_usuario()
         ctx["filtros"] = self.request.GET
-        ctx["page_title"] = "Relatório"
+        ctx["page_title"] = _("Relatório")
         return ctx
 
 

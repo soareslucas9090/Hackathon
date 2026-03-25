@@ -38,6 +38,7 @@ from core.exceptions import (
     ProcessException,
     SystemErrorException,
 )
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +182,7 @@ class BasicActionView(LoginRequiredMixin, View):
         except Exception as exc:
             logger.error("Erro inesperado (AJAX): %s", exc, exc_info=True)
             return self.json_error(
-                "Erro inesperado. Contate o suporte.", status=500
+                _("Erro inesperado. Contate o suporte."), status=500
             )
 
     def json_success(self, data=None, status=200):

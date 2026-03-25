@@ -5,6 +5,7 @@ Responsabilidade: orquestrar a persistência da preferência de moeda,
 chamando a camada de Rules e executando dentro de transaction.atomic().
 """
 from django.db import transaction
+from django.utils.translation import gettext as _
 
 from core.exceptions import BusinessRulesExceptions, ProcessException, SystemErrorException
 from core.mixins import ModelBusiness
@@ -24,5 +25,5 @@ class PreferenciaUsuarioBusiness(ModelBusiness):
             raise
         except Exception as exc:
             raise SystemErrorException(
-                "Erro inesperado ao atualizar a preferência de moeda."
+                _("Erro inesperado ao atualizar a preferência de moeda.")
             ) from exc

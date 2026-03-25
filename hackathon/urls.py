@@ -10,6 +10,7 @@ Estrutura:
   /financeiro/ → URLs do módulo Financeiro (adicionado no Passo 3)
   /admin/      → Django Admin (apenas superusuários)
 """
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import include, path
 
@@ -17,6 +18,10 @@ from Usuario.autenticacao.views import LandingPageView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("i18n/", include("django.conf.urls.i18n")),
+]
+
+urlpatterns += i18n_patterns(
     # Landing page pública — sem namespace para manter LOGOUT_REDIRECT_URL = "landing"
     path("", LandingPageView.as_view(), name="landing"),
     # Módulo de autenticação (namespace "usuario")
@@ -25,7 +30,8 @@ urlpatterns = [
     path("financeiro/", include("Financeiro.lancamentos.urls")),
     # Módulo de Configurações do Usuário
     path("configuracoes/", include("Usuario.configuracoes.urls")),
-]
+    prefix_default_language=True,
+)
 
 # ─── Handlers de erro personalizados ────────────────────────────────────────
 handler400 = "core.error_handlers.handler400"

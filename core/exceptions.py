@@ -8,6 +8,9 @@ Hierarquia de exceções:
 """
 
 
+from django.utils.translation import gettext_lazy as _
+
+
 class BusinessRulesExceptions(Exception):
     """
     Exceção lançada pela camada de Rules quando uma regra de negócio é violada.
@@ -20,11 +23,11 @@ class BusinessRulesExceptions(Exception):
         class MinhaRule:
             def validar_saldo(self, valor):
                 if valor < 0:
-                    raise BusinessRulesExceptions("Saldo não pode ser negativo.")
+                    raise BusinessRulesExceptions(_("Saldo não pode ser negativo."))
                 return False
     """
 
-    def __init__(self, message="Regra de negócio violada."):
+    def __init__(self, message=_("Regra de negócio violada.")):
         self.message = message
         super().__init__(self.message)
 
@@ -46,7 +49,7 @@ class ProcessException(Exception):
                     raise ProcessException(str(e)) from e
     """
 
-    def __init__(self, message="Erro no processamento da operação."):
+    def __init__(self, message=_("Erro no processamento da operação.")):
         self.message = message
         super().__init__(self.message)
 

@@ -6,6 +6,8 @@ Responsabilidade: validar regras de negócio.
 - Lança ``BusinessRulesExceptions`` quando uma regra é violada.
 - Deve ser chamada exclusivamente pela camada de Business.
 """
+from django.utils.translation import gettext as _
+
 from core.exceptions import BusinessRulesExceptions
 from core.mixins import ModelRules
 
@@ -30,7 +32,8 @@ class CategoriaRules(ModelRules):
 
         if qs.exists():
             raise BusinessRulesExceptions(
-                f"Já existe uma categoria com o nome '{self.model_instance.nome}'."
+                _("Já existe uma categoria com o nome '%(nome)s'.")
+                % {"nome": self.model_instance.nome}
             )
         return False
 
@@ -42,7 +45,7 @@ class LancamentoRules(ModelRules):
         """Valida que o valor do lançamento é positivo."""
         if self.model_instance.valor is None or self.model_instance.valor <= 0:
             raise BusinessRulesExceptions(
-                "O valor do lançamento deve ser maior que zero."
+                _("O valor do lançamento deve ser maior que zero.")
             )
         return False
 
@@ -54,6 +57,6 @@ class LancamentoRules(ModelRules):
             and self.model_instance.categoria.usuario_id != self.model_instance.usuario_id
         ):
             raise BusinessRulesExceptions(
-                "A categoria selecionada não pertence ao seu usuário."
+                _("A categoria selecionada não pertence ao seu usuário.")
             )
         return False

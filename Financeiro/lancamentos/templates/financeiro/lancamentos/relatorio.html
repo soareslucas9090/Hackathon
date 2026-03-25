@@ -1,4 +1,5 @@
 {% extends "base_auth.html" %}
+{% load i18n %}
 
 {% block content %}
 <!-- Filtros -->
@@ -6,17 +7,17 @@
   <div class="card-body">
     <form method="get" class="row g-2 align-items-end" id="form-relatorio">
       <div class="col-12 col-md-2">
-        <label class="form-label small">Tipo</label>
+        <label class="form-label small">{% trans "Tipo" %}</label>
         <select name="tipo" class="form-select form-select-sm">
-          <option value="">Todos</option>
-          <option value="receita" {% if filtros.tipo == "receita" %}selected{% endif %}>Receita</option>
-          <option value="despesa" {% if filtros.tipo == "despesa" %}selected{% endif %}>Despesa</option>
+          <option value="">{% trans "Todos" %}</option>
+          <option value="receita" {% if filtros.tipo == "receita" %}selected{% endif %}>{% trans "Receita" %}</option>
+          <option value="despesa" {% if filtros.tipo == "despesa" %}selected{% endif %}>{% trans "Despesa" %}</option>
         </select>
       </div>
       <div class="col-12 col-md-2">
-        <label class="form-label small">Categoria</label>
+        <label class="form-label small">{% trans "Categoria" %}</label>
         <select name="categoria" class="form-select form-select-sm">
-          <option value="">Todas</option>
+          <option value="">{% trans "Todas" %}</option>
           {% for cat in categorias %}
           <option value="{{ cat.pk }}" {% if filtros.categoria == cat.pk|stringformat:"s" %}selected{% endif %}>
             {{ cat.nome }}
@@ -25,20 +26,20 @@
         </select>
       </div>
       <div class="col-12 col-md-2">
-        <label class="form-label small">De</label>
+        <label class="form-label small">{% trans "De" %}</label>
         <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ filtros.data_inicio }}">
       </div>
       <div class="col-12 col-md-2">
-        <label class="form-label small">Até</label>
+        <label class="form-label small">{% trans "Até" %}</label>
         <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ filtros.data_fim }}">
       </div>
       <div class="col-12 col-md-2">
-        <label class="form-label small">Busca</label>
-        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Descrição..." value="{{ filtros.busca }}">
+        <label class="form-label small">{% trans "Busca" %}</label>
+        <input type="text" name="busca" class="form-control form-control-sm" placeholder="{% trans "Descrição..." %}" value="{{ filtros.busca }}">
       </div>
       <div class="col-12 col-md-2 d-flex gap-1">
         <button type="submit" class="btn btn-sm btn-primary flex-fill">
-          <i class="bi bi-funnel"></i> Filtrar
+          <i class="bi bi-funnel"></i> {% trans "Filtrar" %}
         </button>
         <a href="{% url 'financeiro:relatorio' %}" class="btn btn-sm btn-outline-secondary">
           <i class="bi bi-x"></i>
@@ -55,7 +56,7 @@
 <div class="d-flex justify-content-end my-3">
   <a href="{% url 'financeiro:relatorio-pdf' %}?{{ request.GET.urlencode }}"
      class="btn btn-outline-danger" target="_blank">
-    <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF
+    <i class="bi bi-file-earmark-pdf me-1"></i>{% trans "Exportar PDF" %}
   </a>
 </div>
 
@@ -66,11 +67,11 @@
       <table class="table table-hover mb-0">
         <thead class="table-light">
           <tr>
-            <th>Data</th>
-            <th>Descrição</th>
-            <th>Categoria</th>
-            <th>Tipo</th>
-            <th class="text-end">Valor ({{ moeda_usuario.codigo }})</th>
+            <th>{% trans "Data" %}</th>
+            <th>{% trans "Descrição" %}</th>
+            <th>{% trans "Categoria" %}</th>
+            <th>{% trans "Tipo" %}</th>
+            <th class="text-end">{% blocktrans with cod=moeda_usuario.codigo %}Valor ({{ cod }}){% endblocktrans %}</th>
           </tr>
         </thead>
         <tbody>
@@ -85,9 +86,9 @@
             </td>
             <td>
               {% if l.tipo == "receita" %}
-                <span class="badge bg-success">Receita</span>
+                <span class="badge bg-success">{% trans "Receita" %}</span>
               {% else %}
-                <span class="badge bg-danger">Despesa</span>
+                <span class="badge bg-danger">{% trans "Despesa" %}</span>
               {% endif %}
             </td>
             <td class="text-end fw-semibold {% if l.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
@@ -96,22 +97,22 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="5" class="text-center text-muted py-4">Nenhum lançamento encontrado.</td>
+            <td colspan="5" class="text-center text-muted py-4">{% trans "Nenhum lançamento encontrado." %}</td>
           </tr>
           {% endfor %}
         </tbody>
         {% if lancamentos %}
         <tfoot class="table-light fw-semibold">
           <tr>
-            <td colspan="4" class="text-end">Receitas:</td>
+            <td colspan="4" class="text-end">{% trans "Receitas" %}:</td>
             <td class="text-end text-success">R$ {{ saldo.receitas|floatformat:2 }}</td>
           </tr>
           <tr>
-            <td colspan="4" class="text-end">Despesas:</td>
+            <td colspan="4" class="text-end">{% trans "Despesas" %}:</td>
             <td class="text-end text-danger">R$ {{ saldo.despesas|floatformat:2 }}</td>
           </tr>
           <tr>
-            <td colspan="4" class="text-end">Saldo:</td>
+            <td colspan="4" class="text-end">{% trans "Saldo" %}:</td>
             <td class="text-end {% if saldo.saldo >= 0 %}text-primary{% else %}text-danger{% endif %}">
               R$ {{ saldo.saldo|floatformat:2 }}
             </td>

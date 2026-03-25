@@ -1,8 +1,9 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
-  <title>Relatório Financeiro</title>
+  <title>{% trans "Relatório Financeiro" %}</title>
   <style>
     body {
       font-family: Helvetica, Arial, sans-serif;
@@ -73,30 +74,30 @@
 </head>
 <body>
 
-  <h1>Relatório Financeiro Pessoal</h1>
+  <h1>{% trans "Relatório Financeiro Pessoal" %}</h1>
   <div class="subtitulo">
-    Usuário: {{ usuario.get_full_name|default:usuario.username }}
+    {% trans "Usuário" %}: {{ usuario.get_full_name|default:usuario.username }}
     {% if filtros.data_inicio or filtros.data_fim %}
       &nbsp;·&nbsp;
-      Período:
-      {% if filtros.data_inicio %}{{ filtros.data_inicio }}{% else %}início{% endif %}
-      até
-      {% if filtros.data_fim %}{{ filtros.data_fim }}{% else %}hoje{% endif %}
+      {% trans "Período" %}:
+      {% if filtros.data_inicio %}{{ filtros.data_inicio }}{% else %}{% trans "início" %}{% endif %}
+      {% trans "até" %}
+      {% if filtros.data_fim %}{{ filtros.data_fim }}{% else %}{% trans "hoje" %}{% endif %}
     {% endif %}
     {% if filtros.tipo %}
       &nbsp;·&nbsp;
-      Tipo: {{ filtros.tipo|capfirst }}
+      {% trans "Tipo" %}: {{ filtros.tipo|capfirst }}
     {% endif %}
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>Data</th>
-        <th>Descrição</th>
-        <th>Categoria</th>
-        <th>Tipo</th>
-        <th class="text-right">Valor ({{ moeda_usuario.codigo }})</th>
+        <th>{% trans "Data" %}</th>
+        <th>{% trans "Descrição" %}</th>
+        <th>{% trans "Categoria" %}</th>
+        <th>{% trans "Tipo" %}</th>
+        <th class="text-right">{% blocktrans with cod=moeda_usuario.codigo %}Valor ({{ cod }}){% endblocktrans %}</th>
       </tr>
     </thead>
     <tbody>
@@ -107,9 +108,9 @@
         <td>{{ l.categoria.nome }}</td>
         <td>
           {% if l.tipo == "receita" %}
-            <span class="badge-receita">Receita</span>
+            <span class="badge-receita">{% trans "Receita" %}</span>
           {% else %}
-            <span class="badge-despesa">Despesa</span>
+            <span class="badge-despesa">{% trans "Despesa" %}</span>
           {% endif %}
         </td>
         <td class="text-right {% if l.tipo == 'receita' %}badge-receita{% else %}badge-despesa{% endif %}">
@@ -118,7 +119,7 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="5" class="text-right">Nenhum lançamento encontrado.</td>
+        <td colspan="5" class="text-right">{% trans "Nenhum lançamento encontrado." %}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -127,15 +128,15 @@
   <div class="resumo-box">
     <table>
       <tr>
-        <td>Receitas:</td>
+        <td>{% trans "Receitas" %}:</td>
         <td class="text-right badge-receita">{{ moeda_usuario.simbolo }} {{ saldo.receitas|converter_moeda:moeda_usuario.taxa }}</td>
       </tr>
       <tr>
-        <td>Despesas:</td>
+        <td>{% trans "Despesas" %}:</td>
         <td class="text-right badge-despesa">{{ moeda_usuario.simbolo }} {{ saldo.despesas|converter_moeda:moeda_usuario.taxa }}</td>
       </tr>
       <tr>
-        <td><strong>Saldo:</strong></td>
+        <td><strong>{% trans "Saldo" %}:</strong></td>
         <td class="text-right {% if saldo.saldo >= 0 %}saldo-positivo{% else %}saldo-negativo{% endif %}">
           <strong>{{ moeda_usuario.simbolo }} {{ saldo.saldo|converter_moeda:moeda_usuario.taxa }}</strong>
         </td>

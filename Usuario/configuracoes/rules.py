@@ -3,6 +3,8 @@ Camada de Rules do módulo de configurações de usuário.
 
 Valida regras de negócio relacionadas às preferências do usuário.
 """
+from django.utils.translation import gettext as _
+
 from core.exceptions import BusinessRulesExceptions
 from core.mixins import ModelRules
 
@@ -22,7 +24,7 @@ class PreferenciaUsuarioRules(ModelRules):
         codigo = self.model_instance.moeda_preferida
 
         if not codigo or not codigo.strip():
-            raise BusinessRulesExceptions("A moeda preferida não pode ser vazia.")
+            raise BusinessRulesExceptions(_("A moeda preferida não pode ser vazia."))
 
         if codigo == "BRL":
             return
@@ -34,8 +36,9 @@ class PreferenciaUsuarioRules(ModelRules):
             # Só valida se a API retornou dados; se estiver indisponível, aceita o código
             if moedas and codigo not in moedas:
                 raise BusinessRulesExceptions(
-                    f"Moeda '{codigo}' não está disponível para conversão. "
-                    "Selecione uma moeda da lista."
+                    _("Moeda '%(codigo)s' não está disponível para conversão. "
+                      "Selecione uma moeda da lista.")
+                    % {"codigo": codigo}
                 )
         except BusinessRulesExceptions:
             raise

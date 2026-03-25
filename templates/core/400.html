@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}400 — Requisição inválida{% endblock %}
+{% block title %}400 — {% trans "Requisição inválida" %}{% endblock %}
 
 {% block body %}
 <div class="d-flex align-items-center justify-content-center min-vh-100" style="background:#f1f5f9;">
     <div class="text-center px-4">
         <div class="mb-3" style="font-size:5rem; font-weight:900; color:#f59e0b; line-height:1;">400</div>
-        <h2 class="fw-bold mb-2">Requisição inválida</h2>
+        <h2 class="fw-bold mb-2">{% trans "Requisição inválida" %}</h2>
         <p class="text-muted mb-4" style="max-width:400px;">
-            {{ error|default:"A requisição não pôde ser processada. Verifique os dados informados." }}
+            {% if error %}{{ error }}{% else %}{% trans "A requisição não pôde ser processada. Verifique os dados informados." %}{% endif %}
         </p>
         <a href="javascript:history.back()" class="btn text-white px-4" style="background:#4f46e5; border-radius:.75rem;">
-            <i class="bi bi-arrow-left me-1"></i>Voltar
+            <i class="bi bi-arrow-left me-1"></i>{% trans "Voltar" %}
         </a>
     </div>
 </div>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block body %}
 <div class="d-flex" style="min-height: 100vh;">
@@ -21,37 +22,37 @@
             <li class="nav-item">
                 <a href="{% url 'financeiro:dashboard' %}"
                    class="nav-link text-white {% block nav_dashboard %}{% endblock %}">
-                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    <i class="bi bi-speedometer2 me-2"></i> {% trans "Dashboard" %}
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'financeiro:lancamento-lista' %}?tipo=receita"
                    class="nav-link text-white {% block nav_receitas %}{% endblock %}">
-                    <i class="bi bi-arrow-up-circle me-2" style="color:#22c55e;"></i> Receitas
+                    <i class="bi bi-arrow-up-circle me-2" style="color:#22c55e;"></i> {% trans "Receitas" %}
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'financeiro:lancamento-lista' %}?tipo=despesa"
                    class="nav-link text-white {% block nav_despesas %}{% endblock %}">
-                    <i class="bi bi-arrow-down-circle me-2" style="color:#ef4444;"></i> Despesas
+                    <i class="bi bi-arrow-down-circle me-2" style="color:#ef4444;"></i> {% trans "Despesas" %}
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'financeiro:categoria-lista' %}"
                    class="nav-link text-white {% block nav_categorias %}{% endblock %}">
-                    <i class="bi bi-tags me-2"></i> Categorias
+                    <i class="bi bi-tags me-2"></i> {% trans "Categorias" %}
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'financeiro:relatorio' %}"
                    class="nav-link text-white {% block nav_relatorio %}{% endblock %}">
-                    <i class="bi bi-file-earmark-bar-graph me-2"></i> Relatórios
+                    <i class="bi bi-file-earmark-bar-graph me-2"></i> {% trans "Relatórios" %}
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'configuracoes:moeda' %}"
                    class="nav-link text-white {% block nav_configuracoes %}{% endblock %}">
-                    <i class="bi bi-gear me-2"></i> Configurações
+                    <i class="bi bi-gear me-2"></i> {% trans "Configurações" %}
                 </a>
             </li>
         </ul>
@@ -66,7 +67,7 @@
                 <form method="post" action="{% url 'usuario:logout' %}" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-link p-0 small text-secondary text-decoration-none">
-                        <i class="bi bi-box-arrow-right me-1"></i>Sair
+                        <i class="bi bi-box-arrow-right me-1"></i>{% trans "Sair" %}
                     </button>
                 </form>
             </div>
@@ -80,9 +81,25 @@
         <header class="bg-body shadow-sm px-4 py-3 d-flex align-items-center justify-content-between">
             <h5 class="mb-0 fw-semibold text-body">{% block page_title %}{% endblock %}</h5>
             <div class="d-flex align-items-center gap-3">
+                <!-- Troca de idioma -->
+                <form method="post" action="/i18n/setlang/" class="d-inline m-0 p-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="language"
+                           value="{% if LANGUAGE_CODE == 'pt-br' %}en{% else %}pt-br{% endif %}">
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button type="submit"
+                            class="btn btn-link text-body p-0 border-0 lh-1"
+                            title="{% if LANGUAGE_CODE == 'pt-br' %}Switch to English{% else %}Mudar para Português{% endif %}">
+                        <span class="badge bg-secondary bg-opacity-25 text-body px-2 py-1"
+                              style="font-size:.75rem; letter-spacing:.04em;">
+                            {% if LANGUAGE_CODE == 'pt-br' %}EN{% else %}PT{% endif %}
+                        </span>
+                    </button>
+                </form>
+                <!-- Tema escuro/claro -->
                 <button type="button" id="btnToggleTema"
                         class="btn btn-link text-body p-0 border-0 fs-5 lh-1"
-                        title="Mudar para modo escuro">
+                        title="{% trans "Mudar para modo escuro" %}">
                     <i class="bi bi-moon-fill"></i>
                 </button>
                 <span class="text-muted small">
@@ -98,7 +115,7 @@
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans "Fechar" %}"></button>
                 </div>
                 {% endfor %}
             {% endif %}
@@ -111,7 +128,7 @@
 
         <!-- Footer -->
         <footer class="bg-body text-center py-2 text-muted small border-top">
-            Gestão Financeira Pessoal &copy; {% now "Y" %}
+            {% trans "Gestão Financeira Pessoal" %} &copy; {% now "Y" %}
         </footer>
     </div>
 

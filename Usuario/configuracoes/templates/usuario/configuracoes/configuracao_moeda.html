@@ -1,4 +1,5 @@
 {% extends "base_auth.html" %}
+{% load i18n %}
 
 {% block nav_configuracoes %}active{% endblock %}
 
@@ -8,25 +9,23 @@
 
     <div class="card shadow-sm">
       <div class="card-header fw-semibold">
-        <i class="bi bi-currency-exchange me-2"></i>Moeda de Exibição
+        <i class="bi bi-currency-exchange me-2"></i>{% trans "Moeda de Exibição" %}
       </div>
       <div class="card-body">
 
         <p class="text-muted small mb-3">
-          Os valores são sempre armazenados em <strong>Real Brasileiro (BRL)</strong>.
-          A conversão para a moeda selecionada é feita automaticamente em tempo real,
-          utilizando a cotação mais recente da <strong>AwesomeAPI</strong>.
+          {% trans "Os valores são sempre armazenados em <strong>Real Brasileiro (BRL)</strong>. A conversão para a moeda selecionada é feita automaticamente em tempo real, utilizando a cotação mais recente da <strong>AwesomeAPI</strong>." %}
         </p>
 
         {% if api_disponivel and ultima_atualizacao %}
         <p class="text-muted small mb-4">
           <i class="bi bi-clock me-1"></i>
-          Cotações atualizadas em: <strong>{{ ultima_atualizacao }}</strong>
+          {% trans "Cotações atualizadas em:" %} <strong>{{ ultima_atualizacao }}</strong>
         </p>
         {% elif not api_disponivel %}
         <div class="alert alert-warning py-2 mb-3 small">
           <i class="bi bi-exclamation-triangle me-1"></i>
-          API de cotações temporariamente indisponível. Apenas BRL está disponível.
+          {% trans "API de cotações temporariamente indisponível. Apenas BRL está disponível." %}
         </div>
         {% endif %}
 
@@ -35,7 +34,7 @@
 
           <div class="mb-4">
             <label for="{{ form.moeda_preferida.id_for_label }}" class="form-label fw-semibold">
-              Selecionar moeda de exibição
+              {% trans "Selecionar moeda de exibição" %}
             </label>
             {{ form.moeda_preferida }}
             {% if form.moeda_preferida.errors %}
@@ -47,7 +46,7 @@
           {% if moeda_usuario.codigo != "BRL" %}
           <div class="alert alert-info py-2 mb-4 small">
             <i class="bi bi-info-circle me-1"></i>
-            <strong>Cotação atual:</strong>
+            <strong>{% trans "Cotação atual" %}:</strong>
             1 {{ moeda_usuario.codigo }} ≈ R$ {{ moeda_usuario.taxa_inversa|floatformat:4 }}
             &nbsp;·&nbsp;
             R$ 1,00 ≈ {{ moeda_usuario.taxa|floatformat:4 }} {{ moeda_usuario.codigo }}
@@ -56,10 +55,10 @@
 
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">
-              <i class="bi bi-check-lg me-1"></i>Salvar
+              <i class="bi bi-check-lg me-1"></i>{% trans "Salvar" %}
             </button>
             <a href="{% url 'financeiro:dashboard' %}" class="btn btn-outline-secondary">
-              <i class="bi bi-x-lg me-1"></i>Cancelar
+              <i class="bi bi-x-lg me-1"></i>{% trans "Cancelar" %}
             </a>
           </div>
         </form>
@@ -70,12 +69,12 @@
     <!-- Card informativo -->
     <div class="card shadow-sm mt-4 border-0">
       <div class="card-body small text-muted">
-        <p class="mb-1"><i class="bi bi-lightbulb me-1 text-warning"></i><strong>Como funciona?</strong></p>
+        <p class="mb-1"><i class="bi bi-lightbulb me-1 text-warning"></i><strong>{% trans "Como funciona?" %}</strong></p>
         <ul class="mb-0 ps-3">
-          <li>Os lançamentos são sempre cadastrados em <strong>Real (BRL)</strong>.</li>
-          <li>Ao trocar a moeda, todos os valores exibidos serão convertidos automaticamente.</li>
-          <li>As cotações são atualizadas a cada <strong>1 minuto</strong> via AwesomeAPI.</li>
-          <li>A exportação de PDF também reflete a moeda configurada.</li>
+          <li>{% trans "Os lançamentos são sempre cadastrados em <strong>Real (BRL)</strong>." %}</li>
+          <li>{% trans "Ao trocar a moeda, todos os valores exibidos serão convertidos automaticamente." %}</li>
+          <li>{% trans "As cotações são atualizadas a cada <strong>1 minuto</strong> via AwesomeAPI." %}</li>
+          <li>{% trans "A exportação de PDF também reflete a moeda configurada." %}</li>
         </ul>
       </div>
     </div>

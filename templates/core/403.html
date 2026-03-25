@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}403 — Acesso negado{% endblock %}
+{% block title %}403 — {% trans "Acesso negado" %}{% endblock %}
 
 {% block body %}
 <div class="d-flex align-items-center justify-content-center min-vh-100" style="background:#f1f5f9;">
     <div class="text-center px-4">
         <div class="mb-3" style="font-size:5rem; font-weight:900; color:#ef4444; line-height:1;">403</div>
-        <h2 class="fw-bold mb-2">Acesso negado</h2>
+        <h2 class="fw-bold mb-2">{% trans "Acesso negado" %}</h2>
         <p class="text-muted mb-4" style="max-width:400px;">
-            {{ error|default:"Você não tem permissão para acessar este recurso." }}
+            {% if error %}{{ error }}{% else %}{% trans "Você não tem permissão para acessar este recurso." %}{% endif %}
         </p>
         <a href="/" class="btn text-white px-4" style="background:#4f46e5; border-radius:.75rem;">
-            <i class="bi bi-house me-1"></i>Ir para o início
+            <i class="bi bi-house me-1"></i>{% trans "Ir para o início" %}
         </a>
     </div>
 </div>

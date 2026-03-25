@@ -1,8 +1,9 @@
+{% load i18n %}
 <div class="row g-3 mb-2">
   <div class="col-12 col-sm-4">
     <div class="card border-0 shadow-sm">
       <div class="card-body">
-        <p class="text-muted small mb-1">Receitas</p>
+        <p class="text-muted small mb-1">{% trans "Receitas" %}</p>
         <h4 class="fw-bold text-success mb-0">{{ moeda_usuario.simbolo }} {{ saldo.receitas|converter_moeda:moeda_usuario.taxa }}</h4>
       </div>
     </div>
@@ -10,7 +11,7 @@
   <div class="col-12 col-sm-4">
     <div class="card border-0 shadow-sm">
       <div class="card-body">
-        <p class="text-muted small mb-1">Despesas</p>
+        <p class="text-muted small mb-1">{% trans "Despesas" %}</p>
         <h4 class="fw-bold text-danger mb-0">{{ moeda_usuario.simbolo }} {{ saldo.despesas|converter_moeda:moeda_usuario.taxa }}</h4>
       </div>
     </div>
@@ -18,7 +19,7 @@
   <div class="col-12 col-sm-4">
     <div class="card border-0 shadow-sm">
       <div class="card-body">
-        <p class="text-muted small mb-1">Saldo</p>
+        <p class="text-muted small mb-1">{% trans "Saldo" %}</p>
         <h4 class="fw-bold {% if saldo.saldo >= 0 %}text-primary{% else %}text-danger{% endif %} mb-0">
           {{ moeda_usuario.simbolo }} {{ saldo.saldo|converter_moeda:moeda_usuario.taxa }}
         </h4>

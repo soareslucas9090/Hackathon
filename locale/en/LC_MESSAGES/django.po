@@ -1,0 +1,592 @@
+# English translations for Gestão Financeira Pessoal.
+# Copyright (C) 2026
+# This file is distributed under the same license as the hackathon project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hackathon 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 00:00+0000\n"
+"PO-Revision-Date: 2026-03-25 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# ───────────────────────────────────────────────────────────────
+# hackathon/settings.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Português Brasileiro"
+msgstr "Brazilian Portuguese"
+
+msgid "English"
+msgstr "English"
+
+# ───────────────────────────────────────────────────────────────
+# common/constants.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Registro criado com sucesso."
+msgstr "Record created successfully."
+
+msgid "Registro atualizado com sucesso."
+msgstr "Record updated successfully."
+
+msgid "Registro excluído com sucesso."
+msgstr "Record deleted successfully."
+
+msgid "Você não tem permissão para acessar este recurso."
+msgstr "You do not have permission to access this resource."
+
+msgid "O registro solicitado não foi encontrado."
+msgstr "The requested record was not found."
+
+msgid "Ocorreu um erro ao processar a operação. Tente novamente."
+msgstr "An error occurred while processing the operation. Please try again."
+
+msgid "Erro inesperado no sistema. Entre em contato com o suporte."
+msgstr "Unexpected system error. Please contact support."
+
+msgid "Salvar"
+msgstr "Save"
+
+msgid "Cancelar"
+msgstr "Cancel"
+
+msgid "Excluir"
+msgstr "Delete"
+
+msgid "Editar"
+msgstr "Edit"
+
+msgid "Novo"
+msgstr "New"
+
+msgid "Voltar"
+msgstr "Back"
+
+msgid "Confirmar"
+msgstr "Confirm"
+
+msgid "Exportar PDF"
+msgstr "Export PDF"
+
+# ───────────────────────────────────────────────────────────────
+# core/exceptions.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Saldo não pode ser negativo."
+msgstr "Balance cannot be negative."
+
+msgid "Regra de negócio violada."
+msgstr "Business rule violated."
+
+msgid "Erro no processamento da operação."
+msgstr "Error processing the operation."
+
+# ───────────────────────────────────────────────────────────────
+# core/views.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Erro inesperado. Contate o suporte."
+msgstr "Unexpected error. Please contact support."
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/models.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Nome"
+msgstr "Name"
+
+msgid "Descrição"
+msgstr "Description"
+
+msgid "Cor"
+msgstr "Color"
+
+msgid "Cor hexadecimal, ex.: #6366f1"
+msgstr "Hexadecimal color, e.g.: #6366f1"
+
+msgid "Usuário"
+msgstr "User"
+
+msgid "Categoria"
+msgstr "Category"
+
+msgid "Categorias"
+msgstr "Categories"
+
+msgid "Receita"
+msgstr "Income"
+
+msgid "Despesa"
+msgstr "Expense"
+
+msgid "Tipo"
+msgstr "Type"
+
+msgid "Valor"
+msgstr "Amount"
+
+msgid "Data"
+msgstr "Date"
+
+msgid "Observação"
+msgstr "Note"
+
+msgid "Lançamento"
+msgstr "Transaction"
+
+msgid "Lançamentos"
+msgstr "Transactions"
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/forms.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Informe um valor monetário válido."
+msgstr "Please enter a valid monetary amount."
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/business.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Erro inesperado ao criar categoria."
+msgstr "Unexpected error while creating category."
+
+msgid "Erro inesperado ao atualizar categoria."
+msgstr "Unexpected error while updating category."
+
+msgid "Não é possível excluir uma categoria que possui lançamentos."
+msgstr "Cannot delete a category that has transactions."
+
+msgid "Erro inesperado ao excluir categoria."
+msgstr "Unexpected error while deleting category."
+
+msgid "Erro inesperado ao criar lançamento."
+msgstr "Unexpected error while creating transaction."
+
+msgid "Erro inesperado ao atualizar lançamento."
+msgstr "Unexpected error while updating transaction."
+
+msgid "Erro inesperado ao excluir lançamento."
+msgstr "Unexpected error while deleting transaction."
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/rules.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Já existe uma categoria com o nome '%(nome)s'."
+msgstr "A category with the name '%(nome)s' already exists."
+
+msgid "O valor do lançamento deve ser maior que zero."
+msgstr "The transaction amount must be greater than zero."
+
+msgid "A categoria selecionada não pertence ao seu usuário."
+msgstr "The selected category does not belong to your user."
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/views.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Novo Lançamento"
+msgstr "New Transaction"
+
+msgid "Editar Lançamento"
+msgstr "Edit Transaction"
+
+msgid "Nova Categoria"
+msgstr "New Category"
+
+msgid "Editar Categoria"
+msgstr "Edit Category"
+
+msgid "Relatório"
+msgstr "Report"
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/configuracoes/models.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Moeda preferida"
+msgstr "Preferred currency"
+
+msgid "Código ISO da moeda de exibição (ex: BRL, USD, EUR)."
+msgstr "ISO currency code for display (e.g.: BRL, USD, EUR)."
+
+msgid "Preferência do Usuário"
+msgstr "User Preference"
+
+msgid "Preferências dos Usuários"
+msgstr "User Preferences"
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/configuracoes/forms.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Moeda de exibição"
+msgstr "Display currency"
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/configuracoes/views.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Configurações de Moeda"
+msgstr "Currency Settings"
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/configuracoes/business.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "Erro inesperado ao atualizar a preferência de moeda."
+msgstr "Unexpected error while updating currency preference."
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/configuracoes/rules.py
+# ───────────────────────────────────────────────────────────────
+
+msgid "A moeda preferida não pode ser vazia."
+msgstr "The preferred currency cannot be empty."
+
+msgid "Moeda '%(codigo)s' não está disponível para conversão. "
+msgstr "Currency '%(codigo)s' is not available for conversion. "
+
+# ───────────────────────────────────────────────────────────────
+# templates/base.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Gestão Financeira Pessoal"
+msgstr "Personal Finance Management"
+
+msgid "Confirmar Exclusão"
+msgstr "Confirm Deletion"
+
+msgid "Fechar"
+msgstr "Close"
+
+msgid "Deseja realmente excluir este item?"
+msgstr "Do you really want to delete this item?"
+
+# ───────────────────────────────────────────────────────────────
+# templates/base_auth.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Receitas"
+msgstr "Income"
+
+msgid "Despesas"
+msgstr "Expenses"
+
+msgid "Relatórios"
+msgstr "Reports"
+
+msgid "Configurações"
+msgstr "Settings"
+
+msgid "Sair"
+msgstr "Log out"
+
+msgid "Mudar para modo escuro"
+msgstr "Toggle dark mode"
+
+# ───────────────────────────────────────────────────────────────
+# templates/core/400.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Requisição inválida"
+msgstr "Invalid request"
+
+msgid "A requisição não pôde ser processada. Verifique os dados informados."
+msgstr "The request could not be processed. Please check the provided data."
+
+# ───────────────────────────────────────────────────────────────
+# templates/core/403.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Acesso negado"
+msgstr "Access denied"
+
+# "Você não tem permissão para acessar este recurso." already defined above
+
+# ───────────────────────────────────────────────────────────────
+# templates/core/404.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Página não encontrada"
+msgstr "Page not found"
+
+msgid "O registro ou página que você procura não existe ou foi removido."
+msgstr "The record or page you are looking for does not exist or has been removed."
+
+msgid "Ir para o início"
+msgstr "Go to home"
+
+# ───────────────────────────────────────────────────────────────
+# templates/core/500.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Erro interno"
+msgstr "Internal error"
+
+msgid "Erro interno do servidor"
+msgstr "Internal server error"
+
+msgid "Ocorreu um erro inesperado. Por favor, entre em contato com o suporte."
+msgstr "An unexpected error occurred. Please contact support."
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/templates/.../dashboard.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Receitas x Despesas por Mês"
+msgstr "Income vs Expenses by Month"
+
+msgid "Despesas por Categoria"
+msgstr "Expenses by Category"
+
+msgid "Últimos Lançamentos"
+msgstr "Latest Transactions"
+
+msgid "Valor"
+msgstr "Amount"
+
+msgid "Nenhum lançamento registrado."
+msgstr "No transactions recorded."
+
+msgid "Ver todos"
+msgstr "View all"
+
+msgid "Nenhuma despesa registrada."
+msgstr "No expenses recorded."
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/templates/.../lancamento_lista.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Todos"
+msgstr "All"
+
+msgid "Todas"
+msgstr "All"
+
+msgid "De"
+msgstr "From"
+
+msgid "Até"
+msgstr "To"
+
+msgid "Buscar descrição"
+msgstr "Search description"
+
+msgid "Ex: mercado..."
+msgstr "E.g.: grocery..."
+
+msgid "Filtrar"
+msgstr "Filter"
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/templates/.../categoria_lista.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Buscar categoria"
+msgstr "Search category"
+
+msgid "Ex: alimentação..."
+msgstr "E.g.: food..."
+
+msgid "Buscar"
+msgstr "Search"
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/templates/.../relatorio.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Busca"
+msgstr "Search"
+
+msgid "Descrição..."
+msgstr "Description..."
+
+#, python-format
+msgid "Valor (%(cod)s)"
+msgstr "Amount (%(cod)s)"
+
+msgid "Saldo"
+msgstr "Balance"
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/templates/.../relatorio_pdf.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Relatório Financeiro"
+msgstr "Financial Report"
+
+msgid "Relatório Financeiro Pessoal"
+msgstr "Personal Financial Report"
+
+msgid "Período"
+msgstr "Period"
+
+msgid "início"
+msgstr "start"
+
+msgid "até"
+msgstr "to"
+
+msgid "hoje"
+msgstr "today"
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/templates/.../partials/lancamento_tabela.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Ações"
+msgstr "Actions"
+
+#, python-format
+msgid "Deseja realmente excluir o lançamento \"%(desc)s\"?"
+msgstr "Do you really want to delete the transaction \"%(desc)s\"?"
+
+msgid "Nenhum lançamento encontrado."
+msgstr "No transactions found."
+
+# ───────────────────────────────────────────────────────────────
+# Financeiro/lancamentos/templates/.../partials/categoria_tabela.html
+# ───────────────────────────────────────────────────────────────
+
+#, python-format
+msgid "Deseja realmente excluir a categoria \"%(nome)s\"?"
+msgstr "Do you really want to delete the category \"%(nome)s\"?"
+
+msgid "Nenhuma categoria cadastrada."
+msgstr "No categories registered."
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/autenticacao/templates/.../landing.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Simplifique sua vida financeira"
+msgstr "Simplify your financial life"
+
+msgid "Entrar"
+msgstr "Log in"
+
+msgid "Controle suas finanças"
+msgstr "Control your finances"
+
+msgid "com inteligência."
+msgstr "with intelligence."
+
+msgid "Registre receitas e despesas, visualize seu saldo em tempo real e tome decisões financeiras com clareza — tudo num só lugar."
+msgstr "Record income and expenses, view your balance in real time, and make clear financial decisions — all in one place."
+
+msgid "Começar agora"
+msgstr "Get started"
+
+msgid "Ver recursos"
+msgstr "View features"
+
+msgid "Saldo atual"
+msgstr "Current balance"
+
+msgid "Tudo que você precisa"
+msgstr "Everything you need"
+
+msgid "Recursos simples e poderosos para o seu dia a dia financeiro."
+msgstr "Simple and powerful features for your everyday finances."
+
+msgid "Registre entradas de dinheiro com categoria, data e descrição."
+msgstr "Record money inflows with category, date, and description."
+
+msgid "Controle seus gastos e saiba exatamente para onde vai seu dinheiro."
+msgstr "Track your spending and know exactly where your money goes."
+
+msgid "Organize lançamentos por categoria para identificar padrões."
+msgstr "Organize transactions by category to identify patterns."
+
+msgid "Painel visual com saldo atualizado, gráficos e resumo do período."
+msgstr "Visual dashboard with updated balance, charts, and period summary."
+
+msgid "Filtre por período, categoria e exporte em PDF."
+msgstr "Filter by period, category, and export to PDF."
+
+msgid "Privacidade"
+msgstr "Privacy"
+
+msgid "Seus dados são visíveis apenas para você — segurança garantida."
+msgstr "Your data is visible only to you — guaranteed security."
+
+msgid "Pronto para começar?"
+msgstr "Ready to get started?"
+
+msgid "Acesse agora e tenha controle total das suas finanças."
+msgstr "Log in now and take full control of your finances."
+
+msgid "Fazer login"
+msgstr "Log in"
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/autenticacao/templates/.../login.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Entre na sua conta para continuar"
+msgstr "Sign in to your account to continue"
+
+msgid "Seu nome de usuário"
+msgstr "Your username"
+
+msgid "Senha"
+msgstr "Password"
+
+msgid "Sua senha"
+msgstr "Your password"
+
+msgid "Voltar para o início"
+msgstr "Back to home"
+
+# ───────────────────────────────────────────────────────────────
+# Usuario/configuracoes/templates/.../configuracao_moeda.html
+# ───────────────────────────────────────────────────────────────
+
+msgid "Moeda de Exibição"
+msgstr "Display Currency"
+
+msgid "Os valores são sempre armazenados em <strong>Real Brasileiro (BRL)</strong>. A conversão para a moeda selecionada é feita automaticamente em tempo real, utilizando a cotação mais recente da <strong>AwesomeAPI</strong>."
+msgstr "Values are always stored in <strong>Brazilian Real (BRL)</strong>. Conversion to the selected currency is done automatically in real time, using the latest exchange rate from <strong>AwesomeAPI</strong>."
+
+msgid "Cotações atualizadas em:"
+msgstr "Exchange rates updated at:"
+
+msgid "API de cotações temporariamente indisponível. Apenas BRL está disponível."
+msgstr "Exchange rate API temporarily unavailable. Only BRL is available."
+
+msgid "Selecionar moeda de exibição"
+msgstr "Select display currency"
+
+msgid "Cotação atual"
+msgstr "Current exchange rate"
+
+msgid "Como funciona?"
+msgstr "How does it work?"
+
+msgid "Os lançamentos são sempre cadastrados em <strong>Real (BRL)</strong>."
+msgstr "Transactions are always recorded in <strong>Brazilian Real (BRL)</strong>."
+
+msgid "Ao trocar a moeda, todos os valores exibidos serão convertidos automaticamente."
+msgstr "When you change the currency, all displayed values will be converted automatically."
+
+msgid "As cotações são atualizadas a cada <strong>1 minuto</strong> via AwesomeAPI."
+msgstr "Exchange rates are updated every <strong>1 minute</strong> via AwesomeAPI."
+
+msgid "A exportação de PDF também reflete a moeda configurada."
+msgstr "PDF export also reflects the configured currency."

@@ -1,5 +1,6 @@
 """Formulários do módulo de configurações de usuário."""
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from .models import PreferenciaUsuario
 
@@ -24,7 +25,7 @@ class PreferenciaUsuarioForm(forms.ModelForm):
             choices=choices,
             attrs={"class": "form-select form-select-lg"},
         )
-        self.fields["moeda_preferida"].label = "Moeda de exibição"
+        self.fields["moeda_preferida"].label = _("Moeda de exibição")
 
     def _get_choices(self):
         """

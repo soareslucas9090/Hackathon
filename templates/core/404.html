@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}404 — Página não encontrada{% endblock %}
+{% block title %}404 — {% trans "Página não encontrada" %}{% endblock %}
 
 {% block body %}
 <div class="d-flex align-items-center justify-content-center min-vh-100" style="background:#f1f5f9;">
     <div class="text-center px-4">
         <div class="mb-3" style="font-size:5rem; font-weight:900; color:#64748b; line-height:1;">404</div>
-        <h2 class="fw-bold mb-2">Página não encontrada</h2>
+        <h2 class="fw-bold mb-2">{% trans "Página não encontrada" %}</h2>
         <p class="text-muted mb-4" style="max-width:400px;">
-            O registro ou página que você procura não existe ou foi removido.
+            {% trans "O registro ou página que você procura não existe ou foi removido." %}
         </p>
         <a href="/" class="btn text-white px-4" style="background:#4f46e5; border-radius:.75rem;">
-            <i class="bi bi-house me-1"></i>Ir para o início
+            <i class="bi bi-house me-1"></i>{% trans "Ir para o início" %}
         </a>
     </div>
 </div>

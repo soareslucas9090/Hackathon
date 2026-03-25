@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Gestão Financeira Pessoal — Simplifique sua vida financeira{% endblock %}
+{% block title %}{% trans "Gestão Financeira Pessoal" %} — {% trans "Simplifique sua vida financeira" %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -47,6 +48,10 @@
         background: linear-gradient(135deg, #4f46e5, #818cf8);
         border-radius: 1rem; color: #fff;
     }
+    /* Bootstrap sobrescreve o background de .navbar — forçar cor do hero */
+    .navbar.hero {
+        background: #1e1b4b !important;
+    }
 </style>
 {% endblock %}
 
@@ -57,9 +62,23 @@
     <span class="hero-brand">
         <i class="bi bi-wallet2 me-2"></i>FinançasPessoais
     </span>
-    <a href="{% url 'usuario:login' %}" class="btn btn-outline-light btn-sm px-4 rounded-pill">
-        <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
-    </a>
+    <div class="d-flex align-items-center gap-3">
+        <form method="post" action="/i18n/setlang/" class="d-inline m-0 p-0">
+            {% csrf_token %}
+            <input type="hidden" name="language"
+                   value="{% if LANGUAGE_CODE == 'pt-br' %}en{% else %}pt-br{% endif %}">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit"
+                    class="btn btn-outline-light btn-sm rounded-pill px-3"
+                    title="{% if LANGUAGE_CODE == 'pt-br' %}Switch to English{% else %}Mudar para Português{% endif %}">
+                <i class="bi bi-translate me-1"></i>
+                {% if LANGUAGE_CODE == 'pt-br' %}EN{% else %}PT{% endif %}
+            </button>
+        </form>
+        <a href="{% url 'usuario:login' %}" class="btn btn-outline-light btn-sm px-4 rounded-pill">
+            <i class="bi bi-box-arrow-in-right me-1"></i>{% trans "Entrar" %}
+        </a>
+    </div>
 </nav>
 
 <!-- ─── Hero Section ──────────────────────────────────────────────────────── -->
@@ -71,19 +90,18 @@
                     <i class="bi bi-stars me-1"></i> Hackathon Ctrl+Alt+AI
                 </span>
                 <h1 class="hero-title mb-4">
-                    Controle suas finanças<br>
-                    <span style="color:#a5b4fc;">com inteligência.</span>
+                    {% trans "Controle suas finanças" %}<br>
+                    <span style="color:#a5b4fc;">{% trans "com inteligência." %}</span>
                 </h1>
                 <p class="hero-subtitle mb-5">
-                    Registre receitas e despesas, visualize seu saldo em tempo real
-                    e tome decisões financeiras com clareza — tudo num só lugar.
+                    {% trans "Registre receitas e despesas, visualize seu saldo em tempo real e tome decisões financeiras com clareza — tudo num só lugar." %}
                 </p>
                 <div class="d-flex gap-3 flex-wrap">
                     <a href="{% url 'usuario:login' %}" class="btn-hero-primary btn">
-                        <i class="bi bi-rocket-takeoff me-2"></i>Começar agora
+                        <i class="bi bi-rocket-takeoff me-2"></i>{% trans "Começar agora" %}
                     </a>
                     <a href="#features" class="btn btn-outline-light px-4 rounded-pill">
-                        Ver recursos <i class="bi bi-chevron-down ms-1"></i>
+                        {% trans "Ver recursos" %} <i class="bi bi-chevron-down ms-1"></i>
                     </a>
                 </div>
             </div>
@@ -91,7 +109,7 @@
                 <!-- Ilustração simbólica ─ cards de métricas -->
                 <div class="d-flex flex-column gap-3" style="width:320px;">
                     <div class="stat-card p-4">
-                        <p class="mb-1 small opacity-75">Saldo atual</p>
+                        <p class="mb-1 small opacity-75">{% trans "Saldo atual" %}</p>
                         <h3 class="fw-bold mb-0">R$ 4.850,00</h3>
                         <span class="small opacity-75"><i class="bi bi-arrow-up me-1"></i>+12% este mês</span>
                     </div>
@@ -99,14 +117,14 @@
                         <div class="col-6">
                             <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
                                 <i class="bi bi-arrow-up-circle fs-3" style="color:#86efac;"></i>
-                                <p class="mt-2 mb-0 small fw-semibold">Receitas</p>
+                                <p class="mt-2 mb-0 small fw-semibold">{% trans "Receitas" %}</p>
                                 <span class="small opacity-75">R$ 7.200</span>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
                                 <i class="bi bi-arrow-down-circle fs-3" style="color:#fca5a5;"></i>
-                                <p class="mt-2 mb-0 small fw-semibold">Despesas</p>
+                                <p class="mt-2 mb-0 small fw-semibold">{% trans "Despesas" %}</p>
                                 <span class="small opacity-75">R$ 2.350</span>
                             </div>
                         </div>
@@ -121,22 +139,34 @@
 <section id="features" class="py-6 bg-white py-5">
     <div class="container py-4">
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="color:#1e1b4b;">Tudo que você precisa</h2>
-            <p class="text-muted">Recursos simples e poderosos para o seu dia a dia financeiro.</p>
+            <h2 class="fw-bold" style="color:#1e1b4b;">{% trans "Tudo que você precisa" %}</h2>
+            <p class="text-muted">{% trans "Recursos simples e poderosos para o seu dia a dia financeiro." %}</p>
         </div>
         <div class="row g-4">
 
-            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-arrow-up-circle" icon_bg="bg-success bg-opacity-10" icon_color="text-success" title="Receitas" desc="Registre entradas de dinheiro com categoria, data e descrição." %}
+            {% trans "Receitas" as t_receitas %}
+            {% trans "Registre entradas de dinheiro com categoria, data e descrição." as d_receitas %}
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-arrow-up-circle" icon_bg="bg-success bg-opacity-10" icon_color="text-success" title=t_receitas desc=d_receitas %}
 
-            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-arrow-down-circle" icon_bg="bg-danger bg-opacity-10" icon_color="text-danger" title="Despesas" desc="Controle seus gastos e saiba exatamente para onde vai seu dinheiro." %}
+            {% trans "Despesas" as t_despesas %}
+            {% trans "Controle seus gastos e saiba exatamente para onde vai seu dinheiro." as d_despesas %}
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-arrow-down-circle" icon_bg="bg-danger bg-opacity-10" icon_color="text-danger" title=t_despesas desc=d_despesas %}
 
-            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-tags" icon_bg="bg-primary bg-opacity-10" icon_color="text-primary" title="Categorias" desc="Organize lançamentos por categoria para identificar padrões." %}
+            {% trans "Categorias" as t_categorias %}
+            {% trans "Organize lançamentos por categoria para identificar padrões." as d_categorias %}
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-tags" icon_bg="bg-primary bg-opacity-10" icon_color="text-primary" title=t_categorias desc=d_categorias %}
 
-            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-speedometer2" icon_bg="bg-warning bg-opacity-10" icon_color="text-warning" title="Dashboard" desc="Painel visual com saldo atualizado, gráficos e resumo do período." %}
+            {% trans "Dashboard" as t_dashboard %}
+            {% trans "Painel visual com saldo atualizado, gráficos e resumo do período." as d_dashboard %}
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-speedometer2" icon_bg="bg-warning bg-opacity-10" icon_color="text-warning" title=t_dashboard desc=d_dashboard %}
 
-            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-file-earmark-bar-graph" icon_bg="bg-info bg-opacity-10" icon_color="text-info" title="Relatórios" desc="Filtre por período, categoria e exporte em PDF." %}
+            {% trans "Relatórios" as t_relatorios %}
+            {% trans "Filtre por período, categoria e exporte em PDF." as d_relatorios %}
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-file-earmark-bar-graph" icon_bg="bg-info bg-opacity-10" icon_color="text-info" title=t_relatorios desc=d_relatorios %}
 
-            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-shield-lock" icon_bg="bg-secondary bg-opacity-10" icon_color="text-secondary" title="Privacidade" desc="Seus dados são visíveis apenas para você — segurança garantida." %}
+            {% trans "Privacidade" as t_privacidade %}
+            {% trans "Seus dados são visíveis apenas para você — segurança garantida." as d_privacidade %}
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-shield-lock" icon_bg="bg-secondary bg-opacity-10" icon_color="text-secondary" title=t_privacidade desc=d_privacidade %}
 
         </div>
     </div>
@@ -145,17 +175,17 @@
 <!-- ─── CTA Final ─────────────────────────────────────────────────────────── -->
 <section class="py-5 text-center" style="background: linear-gradient(135deg,#1e1b4b,#4f46e5); color:#fff;">
     <div class="container py-3">
-        <h2 class="fw-bold mb-3">Pronto para começar?</h2>
-        <p class="mb-4 opacity-75">Acesse agora e tenha controle total das suas finanças.</p>
+        <h2 class="fw-bold mb-3">{% trans "Pronto para começar?" %}</h2>
+        <p class="mb-4 opacity-75">{% trans "Acesse agora e tenha controle total das suas finanças." %}</p>
         <a href="{% url 'usuario:login' %}" class="btn-hero-primary btn fs-6">
-            <i class="bi bi-box-arrow-in-right me-2"></i>Fazer login
+            <i class="bi bi-box-arrow-in-right me-2"></i>{% trans "Fazer login" %}
         </a>
     </div>
 </section>
 
 <!-- ─── Footer ────────────────────────────────────────────────────────────── -->
 <footer class="text-center py-3 text-muted small bg-white border-top">
-    Gestão Financeira Pessoal &copy; {% now "Y" %} — Hackathon Ctrl+Alt+AI
+    {% trans "Gestão Financeira Pessoal" %} &copy; {% now "Y" %} — Hackathon Ctrl+Alt+AI
 </footer>
 
 {% endblock %}

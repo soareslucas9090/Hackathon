@@ -11,6 +11,7 @@ composição. As classes de Business, Helper e Rules são associadas em
 """
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from core.models import BasicModel
 from core.mixins import BusinessModelMixin, HelperModelMixin, RulesModelMixin
@@ -31,24 +32,24 @@ class Categoria(BasicModel, BusinessModelMixin, HelperModelMixin, RulesModelMixi
     helper_class = None
     rules_class = None
 
-    nome = models.CharField(max_length=100, verbose_name="Nome")
-    descricao = models.CharField(max_length=255, blank=True, verbose_name="Descrição")
+    nome = models.CharField(max_length=100, verbose_name=_("Nome"))
+    descricao = models.CharField(max_length=255, blank=True, verbose_name=_("Descrição"))
     cor = models.CharField(
         max_length=7,
         default="#6366f1",
-        verbose_name="Cor",
-        help_text="Cor hexadecimal, ex.: #6366f1",
+        verbose_name=_("Cor"),
+        help_text=_("Cor hexadecimal, ex.: #6366f1"),
     )
     usuario = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         related_name="categorias",
-        verbose_name="Usuário",
+        verbose_name=_("Usuário"),
     )
 
     class Meta:
-        verbose_name = "Categoria"
-        verbose_name_plural = "Categorias"
+        verbose_name = _("Categoria")
+        verbose_name_plural = _("Categorias")
         ordering = ["nome"]
         unique_together = [("nome", "usuario")]
 
@@ -68,8 +69,8 @@ class Lancamento(BasicModel, BusinessModelMixin, HelperModelMixin, RulesModelMix
     TIPO_RECEITA = "receita"
     TIPO_DESPESA = "despesa"
     TIPO_CHOICES = [
-        (TIPO_RECEITA, "Receita"),
-        (TIPO_DESPESA, "Despesa"),
+        (TIPO_RECEITA, _("Receita")),
+        (TIPO_DESPESA, _("Despesa")),
     ]
 
     # Associadas em LancamentosConfig.ready()
@@ -80,32 +81,32 @@ class Lancamento(BasicModel, BusinessModelMixin, HelperModelMixin, RulesModelMix
     tipo = models.CharField(
         max_length=10,
         choices=TIPO_CHOICES,
-        verbose_name="Tipo",
+        verbose_name=_("Tipo"),
     )
-    descricao = models.CharField(max_length=255, verbose_name="Descrição")
+    descricao = models.CharField(max_length=255, verbose_name=_("Descrição"))
     valor = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        verbose_name="Valor (R$)",
+        verbose_name=_("Valor"),
     )
-    data = models.DateField(verbose_name="Data")
+    data = models.DateField(verbose_name=_("Data"))
     categoria = models.ForeignKey(
         Categoria,
         on_delete=models.PROTECT,
         related_name="lancamentos",
-        verbose_name="Categoria",
+        verbose_name=_("Categoria"),
     )
     usuario = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         related_name="lancamentos",
-        verbose_name="Usuário",
+        verbose_name=_("Usuário"),
     )
-    observacao = models.TextField(blank=True, verbose_name="Observação")
+    observacao = models.TextField(blank=True, verbose_name=_("Observação"))
 
     class Meta:
-        verbose_name = "Lançamento"
-        verbose_name_plural = "Lançamentos"
+        verbose_name = _("Lançamento")
+        verbose_name_plural = _("Lançamentos")
         ordering = ["-data", "-created_at"]
 
     def __str__(self):

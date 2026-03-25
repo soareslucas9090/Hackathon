@@ -4,6 +4,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 
 from common.constants import MSG_ATUALIZADO_SUCESSO
 from core.views import BasicUpdateView
@@ -39,7 +40,7 @@ class ConfiguracaoMoedaView(BasicUpdateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["page_title"] = "Configurações de Moeda"
+        ctx["page_title"] = _("Configurações de Moeda")
 
         try:
             from common.currency_service import obter_cotacoes

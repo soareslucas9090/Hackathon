@@ -1,4 +1,6 @@
 """Formulários do módulo Financeiro."""
+from decimal import Decimal
+
 from django import forms
 
 from common.widgets import DatePickerInput, MoneyInput
@@ -46,9 +48,10 @@ class LancamentoForm(forms.ModelForm):
             "tipo": forms.Select(attrs={"class": "form-select"}),
         }
 
-    def __init__(self, *args, usuario=None, **kwargs):
+    def __init__(self, *args, usuario=None, taxa_moeda=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.usuario = usuario
+        self.taxa_moeda = Decimal(str(taxa_moeda)) if taxa_moeda is not None else Decimal("1")
         if usuario:
             self.fields["categoria"].queryset = Categoria.objects.filter(
                 usuario=usuario
@@ -60,21 +63,39 @@ class LancamentoForm(forms.ModelForm):
             elif not isinstance(widget, forms.CheckboxInput):
                 widget.attrs.setdefault("class", "form-control")
 
+        # Na edição, converte o valor armazenado (BRL) para a moeda do usuário
+        if (
+            self.taxa_moeda != Decimal("1")
+            and self.instance
+            and self.instance.pk
+            and self.instance.valor
+        ):
+            self.initial["valor"] = (self.instance.valor / self.taxa_moeda).quantize(
+                Decimal("0.01")
+            )
+
     def clean_valor(self):
         """
         Fallback server-side: converte valor da máscara BR (1.234,56)
         para o formato decimal esperado pelo Python (1234.56).
         Necessário caso o JavaScript esteja desabilitado no client.
+
+        Se o usuário possui uma moeda diferente de BRL, o valor digitado é
+        convertido para Real antes de persistir:
+            valor_brl = valor_entrada × taxa_inversa (bid)
         """
         valor = self.cleaned_data.get("valor")
         if isinstance(valor, str):
             valor = valor.replace(".", "").replace(",", ".")
-            from decimal import Decimal, InvalidOperation
+            from decimal import InvalidOperation
             try:
-                return Decimal(valor)
+                valor = Decimal(valor)
             except InvalidOperation:
                 from django.core.exceptions import ValidationError
                 raise ValidationError("Informe um valor monetário válido.")
+        # Converte da moeda do usuário para BRL
+        if valor and self.taxa_moeda and self.taxa_moeda != Decimal("1"):
+            valor = (valor * self.taxa_moeda).quantize(Decimal("0.01"))
         return valor
 
     def save(self, commit=True):

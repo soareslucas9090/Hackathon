@@ -1,6 +1,5 @@
 """Views do módulo Financeiro."""
 import json
-from decimal import Decimal
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -100,6 +99,7 @@ class LancamentoCreateView(BasicCreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["usuario"] = self.request.user
+        kwargs["taxa_moeda"] = LancamentoHelper.obter_taxa_moeda(self.request.user)
         return kwargs
 
     def form_valid(self, form):
@@ -130,6 +130,7 @@ class LancamentoUpdateView(BasicUpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["usuario"] = self.request.user
+        kwargs["taxa_moeda"] = LancamentoHelper.obter_taxa_moeda(self.request.user)
         return kwargs
 
     def form_valid(self, form):

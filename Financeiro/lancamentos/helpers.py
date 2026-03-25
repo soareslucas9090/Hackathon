@@ -169,3 +169,36 @@ class LancamentoHelper(ModelHelper):
             .annotate(total=Sum("valor"))
             .order_by("-total")
         )
+
+    @staticmethod
+    def obter_taxa_moeda(usuario):
+        """
+        Retorna a taxa_inversa (bid) da moeda preferida do usuário autenticado.
+
+        A taxa_inversa representa quantos BRL valem 1 unidade da moeda escolhida.
+        Fórmulas de conversão:
+          valor_brl      = valor_na_moeda × taxa_inversa
+          valor_na_moeda = valor_brl      ÷ taxa_inversa
+
+        Retorna Decimal("1") para BRL ou em caso de falha (conversão neutra).
+        """
+        try:
+            from Usuario.configuracoes.helpers import PreferenciaUsuarioHelper
+            from common.currency_service import obter_cotacoes
+
+            preferencia = PreferenciaUsuarioHelper.obter_preferencia(usuario)
+            codigo = preferencia.moeda_preferida if preferencia else "BRL"
+
+            if codigo == "BRL":
+                return Decimal("1")
+
+            dados = obter_cotacoes()
+            if dados:
+                info = dados.get("cotacoes", {}).get(codigo)
+                if info:
+                    bid = Decimal(str(info["bid"]))
+                    if bid > 0:
+                        return bid
+        except Exception:
+            pass
+        return Decimal("1")

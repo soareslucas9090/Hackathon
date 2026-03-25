@@ -161,7 +161,8 @@ class CategoriaListView(BasicTableView):
     partial_template_name = "financeiro/lancamentos/partials/categoria_tabela.html"
 
     def get_queryset(self):
-        return Categoria.objects.filter(usuario=self.request.user).order_by("nome")
+        busca = self.request.GET.get("busca")
+        return CategoriaHelper.listar_por_usuario(self.request.user, busca=busca)
 
     def get_template_names(self):
         if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -170,6 +171,7 @@ class CategoriaListView(BasicTableView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ctx["busca"] = self.request.GET.get("busca", "")
         ctx["page_title"] = "Categorias"
         return ctx
 

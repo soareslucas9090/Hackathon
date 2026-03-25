@@ -17,11 +17,14 @@ class CategoriaHelper(ModelHelper):
 
     # ------------------------------------------------------------------ static
     @staticmethod
-    def listar_por_usuario(usuario):
+    def listar_por_usuario(usuario, busca=None):
         """Retorna todas as categorias do usuário ordenadas por nome."""
         from .models import Categoria
 
-        return Categoria.objects.filter(usuario=usuario).order_by("nome")
+        qs = Categoria.objects.filter(usuario=usuario).order_by("nome")
+        if busca:
+            qs = qs.filter(nome__icontains=busca)
+        return qs
 
 
 class LancamentoHelper(ModelHelper):

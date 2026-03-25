@@ -76,6 +76,40 @@ class AnaliseFinanceiraView(BasicActionView):
         return self.json_success({"analise": analise})
 
 
+class AnaliseFinanceiraPDFView(BasicTemplateView):
+    """Recebe o texto da análise via POST e gera PDF para download."""
+
+    def post(self, request, *args, **kwargs):
+        from xhtml2pdf import pisa
+        import markdown as md
+        from core.exceptions import ProcessException
+
+        analise_texto = request.POST.get("analise", "").strip()
+        if not analise_texto:
+            raise ProcessException(
+                _("Nenhuma análise para exportar. Gere a análise antes de baixar o PDF.")
+            )
+
+        analise_html = md.markdown(
+            analise_texto,
+            extensions=["extra", "nl2br"],
+        )
+
+        template = get_template("financeiro/lancamentos/analise_pdf.html")
+        html = template.render(
+            {
+                "analise_html": analise_html,
+                "usuario": request.user,
+            },
+            request,
+        )
+
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = 'attachment; filename="analise-financeira.pdf"'
+        pisa.CreatePDF(html, dest=response)
+        return response
+
+
 # ─────────────────────────────────────────── Lançamentos ─────────────────────
 
 class LancamentoListView(BasicTableView):

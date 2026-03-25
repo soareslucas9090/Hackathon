@@ -1,0 +1,101 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>{% trans "Análise Financeira IA" %}</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 11px;
+      color: #1e1b4b;
+      margin: 20px;
+    }
+    h1 {
+      font-size: 16px;
+      color: #4f46e5;
+      margin-bottom: 2px;
+    }
+    .subtitulo {
+      font-size: 10px;
+      color: #6b7280;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+    h2 {
+      font-size: 13px;
+      color: #4f46e5;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    h3 {
+      font-size: 11px;
+      color: #3730a3;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    p {
+      margin: 4px 0 8px 0;
+      line-height: 1.5;
+    }
+    ul, ol {
+      margin: 4px 0 8px 16px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 3px;
+      line-height: 1.5;
+    }
+    strong {
+      color: #1e1b4b;
+    }
+    em {
+      color: #6b7280;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 12px 0;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 9px;
+      color: #9ca3af;
+      text-align: center;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 8px;
+    }
+    blockquote {
+      border-left: 3px solid #4f46e5;
+      margin: 8px 0 8px 8px;
+      padding: 4px 8px;
+      color: #6b7280;
+    }
+    code {
+      font-family: Courier, monospace;
+      font-size: 10px;
+      background-color: #f5f3ff;
+      padding: 1px 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>{% trans "Análise Financeira Inteligente" %}</h1>
+  <div class="subtitulo">
+    {% trans "Usuário" %}: {{ usuario.get_full_name|default:usuario.username }}
+    &nbsp;·&nbsp;
+    {% trans "Gerado em" %}: {% now "d/m/Y \à\s H:i" %}
+    &nbsp;·&nbsp;
+    {% trans "Baseado nos últimos 3 meses" %}
+  </div>
+
+  {{ analise_html|safe }}
+
+  <div class="footer">
+    {% trans "Gestão Financeira Pessoal" %} &mdash; {% trans "Análise gerada por IA (OpenAI)" %}
+  </div>
+
+</body>
+</html>

@@ -10,6 +10,7 @@ urlpatterns = [
     path("", views.DashboardView.as_view(), name="dashboard"),
     # Análise financeira IA
     path("analise/", views.AnaliseFinanceiraView.as_view(), name="analise-financeira"),
+    path("analise/pdf/", views.AnaliseFinanceiraPDFView.as_view(), name="analise-pdf"),
     # Lançamentos
     path("lancamentos/", views.LancamentoListView.as_view(), name="lancamento-lista"),
     path("lancamentos/novo/", views.LancamentoCreateView.as_view(), name="lancamento-criar"),

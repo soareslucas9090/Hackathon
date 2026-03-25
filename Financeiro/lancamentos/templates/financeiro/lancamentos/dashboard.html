@@ -12,6 +12,12 @@
   </button>
 </div>
 
+<!-- Formulário hidden para gerar PDF da análise -->
+<form id="formAnalisePDF" method="post" action="{% url 'financeiro:analise-pdf' %}" style="display:none;">
+  {% csrf_token %}
+  <input type="hidden" name="analise" id="analiseTextoHidden">
+</form>
+
 <!-- Loading overlay (tela travada) -->
 <div id="analiseLoading" class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
      style="background:rgba(0,0,0,0.55);z-index:9999;">
@@ -37,6 +43,9 @@
       <div class="modal-body" id="analiseConteudo" style="overflow-y:auto;max-height:65vh;">
       </div>
       <div class="modal-footer">
+        <button type="button" id="btnBaixarPDF" class="btn btn-outline-danger d-none">
+          <i class="bi bi-file-earmark-pdf me-1"></i>{% trans "Baixar PDF" %}
+        </button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Fechar" %}</button>
       </div>
     </div>
@@ -212,9 +221,21 @@ if (catLabels.length) {
   var btnAnalise = document.getElementById('btnAnalise');
   var loading = document.getElementById('analiseLoading');
   var conteudo = document.getElementById('analiseConteudo');
+  var btnPDF = document.getElementById('btnBaixarPDF');
+  var formPDF = document.getElementById('formAnalisePDF');
+  var analiseTextoHidden = document.getElementById('analiseTextoHidden');
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+  // Botão PDF submete o formulário com o texto bruto da análise
+  btnPDF.addEventListener('click', function() {
+    formPDF.submit();
+  });
+
   btnAnalise.addEventListener('click', function() {
+    // Oculta botão PDF de análise anterior (se houver)
+    btnPDF.classList.add('d-none');
+    analiseTextoHidden.value = '';
+
     // Mostrar loading e travar tela
     loading.classList.remove('d-none');
     loading.classList.add('d-flex');
@@ -241,6 +262,9 @@ if (catLabels.length) {
 
       if (result.body.success && result.body.analise) {
         conteudo.innerHTML = marked.parse(result.body.analise);
+        // Guarda texto bruto para o PDF
+        analiseTextoHidden.value = result.body.analise;
+        btnPDF.classList.remove('d-none');
         var modal = new bootstrap.Modal(document.getElementById('modalAnalise'));
         modal.show();
       } else {

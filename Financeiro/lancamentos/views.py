@@ -22,8 +22,8 @@ from core.views import (
     BasicUpdateView,
 )
 
+from common.util import calcular_saldo_por_queryset
 from .forms import CategoriaForm, LancamentoForm
-from .helpers import CategoriaHelper, LancamentoHelper
 from .models import Categoria, Lancamento
 
 
@@ -35,11 +35,12 @@ class DashboardView(BasicTemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         usuario = self.request.user
-        ctx["saldo"] = LancamentoHelper.calcular_saldo_usuario(usuario)
-        ctx["ultimos"] = LancamentoHelper.ultimos_lancamentos(usuario)
+        _proxy = Lancamento(usuario=usuario)
+        ctx["saldo"] = _proxy.helper.calcular_saldo_usuario()
+        ctx["ultimos"] = _proxy.helper.ultimos_lancamentos()
 
         # dados para o gráfico de barras (receitas x despesas por mês)
-        totais_mes = LancamentoHelper.totais_por_mes(usuario)
+        totais_mes = _proxy.helper.totais_por_mes()
         ctx["grafico_meses"] = json.dumps(
             [m["mes"].strftime("%m/%Y") for m in totais_mes]
         )
@@ -51,7 +52,7 @@ class DashboardView(BasicTemplateView):
         )
 
         # dados para o gráfico de rosca (despesas por categoria)
-        por_cat = list(LancamentoHelper.totais_por_categoria(usuario, tipo=Lancamento.TIPO_DESPESA))
+        por_cat = list(_proxy.helper.totais_por_categoria(tipo=Lancamento.TIPO_DESPESA))
         ctx["grafico_cat_labels"] = json.dumps([c["categoria__nome"] for c in por_cat])
         ctx["grafico_cat_valores"] = json.dumps([float(c["total"]) for c in por_cat])
         ctx["grafico_cat_cores"] = json.dumps([c["categoria__cor"] for c in por_cat])
@@ -75,7 +76,7 @@ class LancamentoListView(BasicTableView):
             "data_fim": self.request.GET.get("data_fim") or None,
             "busca": self.request.GET.get("busca"),
         }
-        return LancamentoHelper.listar_por_usuario(self.request.user, filtros)
+        return Lancamento(usuario=self.request.user).helper.listar_por_usuario(filtros)
 
     def get_template_names(self):
         if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -99,7 +100,7 @@ class LancamentoCreateView(BasicCreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["usuario"] = self.request.user
-        kwargs["taxa_moeda"] = LancamentoHelper.obter_taxa_moeda(self.request.user)
+        kwargs["taxa_moeda"] = Lancamento(usuario=self.request.user).helper.obter_taxa_moeda()
         return kwargs
 
     def form_valid(self, form):
@@ -130,7 +131,7 @@ class LancamentoUpdateView(BasicUpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["usuario"] = self.request.user
-        kwargs["taxa_moeda"] = LancamentoHelper.obter_taxa_moeda(self.request.user)
+        kwargs["taxa_moeda"] = Lancamento(usuario=self.request.user).helper.obter_taxa_moeda()
         return kwargs
 
     def form_valid(self, form):
@@ -163,7 +164,7 @@ class CategoriaListView(BasicTableView):
 
     def get_queryset(self):
         busca = self.request.GET.get("busca")
-        return CategoriaHelper.listar_por_usuario(self.request.user, busca=busca)
+        return Categoria(usuario=self.request.user).helper.listar_por_usuario(busca=busca)
 
     def get_template_names(self):
         if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -260,12 +261,13 @@ class RelatorioView(BasicTemplateView):
         usuario = self.request.user
         filtros = self._get_filtros()
 
-        lancamentos = LancamentoHelper.listar_por_usuario(usuario, filtros)
-        saldo = LancamentoHelper.calcular_saldo_usuario_qs(lancamentos)
+        _proxy_lanc = Lancamento(usuario=usuario)
+        lancamentos = _proxy_lanc.helper.listar_por_usuario(filtros)
+        saldo = calcular_saldo_por_queryset(lancamentos)
 
         ctx["lancamentos"] = lancamentos
         ctx["saldo"] = saldo
-        ctx["categorias"] = CategoriaHelper.listar_por_usuario(usuario)
+        ctx["categorias"] = Categoria(usuario=usuario).helper.listar_por_usuario()
         ctx["filtros"] = self.request.GET
         ctx["page_title"] = "Relatório"
         return ctx
@@ -285,8 +287,9 @@ class RelatorioPDFView(BasicTemplateView):
             "data_fim": request.GET.get("data_fim") or None,
             "busca": request.GET.get("busca") or None,
         }
-        lancamentos = LancamentoHelper.listar_por_usuario(usuario, filtros)
-        saldo = LancamentoHelper.calcular_saldo_usuario_qs(lancamentos)
+        _proxy_lanc = Lancamento(usuario=usuario)
+        lancamentos = _proxy_lanc.helper.listar_por_usuario(filtros)
+        saldo = calcular_saldo_por_queryset(lancamentos)
 
         template = get_template("financeiro/lancamentos/relatorio_pdf.html")
         html = template.render({

@@ -15,13 +15,13 @@ from core.mixins import ModelHelper
 class CategoriaHelper(ModelHelper):
     """Helpers de consulta para Categoria."""
 
-    # ------------------------------------------------------------------ static
-    @staticmethod
-    def listar_por_usuario(usuario, busca=None):
+    def listar_por_usuario(self, busca=None):
         """Retorna todas as categorias do usuário ordenadas por nome."""
         from .models import Categoria
 
-        qs = Categoria.objects.filter(usuario=usuario).order_by("nome")
+        qs = Categoria.objects.filter(
+            usuario=self.model_instance.usuario
+        ).order_by("nome")
         if busca:
             qs = qs.filter(nome__icontains=busca)
         return qs
@@ -30,9 +30,7 @@ class CategoriaHelper(ModelHelper):
 class LancamentoHelper(ModelHelper):
     """Helpers de consulta para Lançamento."""
 
-    # ------------------------------------------------------------------ static
-    @staticmethod
-    def listar_por_usuario(usuario, filtros=None):
+    def listar_por_usuario(self, filtros=None):
         """
         Retorna lançamentos do usuário aplicando filtros opcionais.
 
@@ -45,9 +43,9 @@ class LancamentoHelper(ModelHelper):
         """
         from .models import Lancamento
 
-        qs = Lancamento.objects.filter(usuario=usuario).select_related(
-            "categoria", "usuario"
-        )
+        qs = Lancamento.objects.filter(
+            usuario=self.model_instance.usuario
+        ).select_related("categoria", "usuario")
         if filtros:
             if filtros.get("tipo"):
                 qs = qs.filter(tipo=filtros["tipo"])
@@ -61,64 +59,38 @@ class LancamentoHelper(ModelHelper):
                 qs = qs.filter(descricao__icontains=filtros["busca"])
         return qs
 
-    @staticmethod
-    def calcular_saldo_usuario(usuario):
+    def calcular_saldo_usuario(self):
         """
         Retorna um dict com ``receitas``, ``despesas`` e ``saldo`` do usuário.
 
         Todos os valores são :class:`~decimal.Decimal`.
         """
         from .models import Lancamento
+        from common.util import calcular_saldo_por_queryset
 
-        qs = Lancamento.objects.filter(usuario=usuario)
-        return LancamentoHelper.calcular_saldo_usuario_qs(qs)
+        qs = Lancamento.objects.filter(usuario=self.model_instance.usuario)
+        return calcular_saldo_por_queryset(qs)
 
-    @staticmethod
-    def calcular_saldo_usuario_qs(qs):
-        """
-        Calcula receitas, despesas e saldo a partir de um queryset já filtrado.
-
-        Permite reutilizar o cálculo no relatório com filtros aplicados.
-        """
-        from .models import Lancamento
-
-        receitas = (
-            qs.filter(tipo=Lancamento.TIPO_RECEITA).aggregate(t=Sum("valor"))["t"]
-            or Decimal("0.00")
-        )
-        despesas = (
-            qs.filter(tipo=Lancamento.TIPO_DESPESA).aggregate(t=Sum("valor"))["t"]
-            or Decimal("0.00")
-        )
-        return {
-            "receitas": receitas,
-            "despesas": despesas,
-            "saldo": receitas - despesas,
-        }
-
-    @staticmethod
-    def ultimos_lancamentos(usuario, n=5):
+    def ultimos_lancamentos(self, n=5):
         """Retorna os ``n`` lançamentos mais recentes do usuário."""
         from .models import Lancamento
 
         return (
-            Lancamento.objects.filter(usuario=usuario)
+            Lancamento.objects.filter(usuario=self.model_instance.usuario)
             .select_related("categoria", "usuario")
             .order_by("-data", "-created_at")[:n]
         )
 
-    @staticmethod
-    def totais_por_mes(usuario, ano=None):
+    def totais_por_mes(self, ano=None):
         """
         Retorna lista de dicts com receitas e despesas agrupadas por mês.
 
         Cada item contém ``mes`` (date do primeiro dia), ``receitas`` e ``despesas``.
         Usado para montar o gráfico de barras mensal no dashboard.
         """
-        from django.db.models import Case, Value, When
         from .models import Lancamento
 
-        qs = Lancamento.objects.filter(usuario=usuario)
+        qs = Lancamento.objects.filter(usuario=self.model_instance.usuario)
         if ano:
             qs = qs.filter(data__year=ano)
 
@@ -150,8 +122,7 @@ class LancamentoHelper(ModelHelper):
 
         return sorted(dados.values(), key=lambda x: x["mes"])
 
-    @staticmethod
-    def totais_por_categoria(usuario, tipo=None):
+    def totais_por_categoria(self, tipo=None):
         """
         Retorna lista de dicts com total agrupado por categoria.
 
@@ -160,7 +131,9 @@ class LancamentoHelper(ModelHelper):
         """
         from .models import Lancamento
 
-        qs = Lancamento.objects.filter(usuario=usuario).select_related("categoria")
+        qs = Lancamento.objects.filter(
+            usuario=self.model_instance.usuario
+        ).select_related("categoria")
         if tipo:
             qs = qs.filter(tipo=tipo)
 
@@ -170,8 +143,7 @@ class LancamentoHelper(ModelHelper):
             .order_by("-total")
         )
 
-    @staticmethod
-    def obter_taxa_moeda(usuario):
+    def obter_taxa_moeda(self):
         """
         Retorna a taxa_inversa (bid) da moeda preferida do usuário autenticado.
 
@@ -182,11 +154,12 @@ class LancamentoHelper(ModelHelper):
 
         Retorna Decimal("1") para BRL ou em caso de falha (conversão neutra).
         """
+        usuario = self.model_instance.usuario
         try:
-            from Usuario.configuracoes.helpers import PreferenciaUsuarioHelper
+            from Usuario.configuracoes.models import PreferenciaUsuario
             from common.currency_service import obter_cotacoes
 
-            preferencia = PreferenciaUsuarioHelper.obter_preferencia(usuario)
+            preferencia = PreferenciaUsuario(usuario=usuario).helper.obter_preferencia()
             codigo = preferencia.moeda_preferida if preferencia else "BRL"
 
             if codigo == "BRL":

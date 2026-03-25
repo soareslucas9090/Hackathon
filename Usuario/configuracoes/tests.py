@@ -181,19 +181,15 @@ class PreferenciaUsuarioHelperTest(TestCase):
         )
 
     def test_cria_preferencia_se_nao_existir(self):
-        from .helpers import PreferenciaUsuarioHelper
-
         self.assertFalse(PreferenciaUsuario.objects.filter(usuario=self.usuario).exists())
-        pref = PreferenciaUsuarioHelper.obter_preferencia(self.usuario)
+        pref = PreferenciaUsuario(usuario=self.usuario).helper.obter_preferencia()
         self.assertIsNotNone(pref)
         self.assertEqual(pref.moeda_preferida, "BRL")
         self.assertTrue(PreferenciaUsuario.objects.filter(usuario=self.usuario).exists())
 
     def test_retorna_existente_sem_duplicar(self):
-        from .helpers import PreferenciaUsuarioHelper
-
         PreferenciaUsuario.objects.create(usuario=self.usuario, moeda_preferida="EUR")
-        pref = PreferenciaUsuarioHelper.obter_preferencia(self.usuario)
+        pref = PreferenciaUsuario(usuario=self.usuario).helper.obter_preferencia()
         self.assertEqual(pref.moeda_preferida, "EUR")
         self.assertEqual(PreferenciaUsuario.objects.filter(usuario=self.usuario).count(), 1)
 

@@ -27,9 +27,9 @@ class ConfiguracaoMoedaView(BasicUpdateView):
 
     def get_object(self, queryset=None):
         """Obtém ou cria a PreferenciaUsuario do usuário logado."""
-        from .helpers import PreferenciaUsuarioHelper
+        from .models import PreferenciaUsuario
 
-        return PreferenciaUsuarioHelper.obter_preferencia(self.request.user)
+        return PreferenciaUsuario(usuario=self.request.user).helper.obter_preferencia()
 
     def form_valid(self, form):
         preferencia = form.save(commit=False)

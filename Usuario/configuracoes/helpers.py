@@ -9,8 +9,7 @@ from core.mixins import ModelHelper
 class PreferenciaUsuarioHelper(ModelHelper):
     """Helpers de consulta para PreferenciaUsuario."""
 
-    @staticmethod
-    def obter_preferencia(usuario):
+    def obter_preferencia(self):
         """
         Retorna a PreferenciaUsuario do usuário.
 
@@ -20,7 +19,7 @@ class PreferenciaUsuarioHelper(ModelHelper):
         from .models import PreferenciaUsuario
 
         preferencia, _ = PreferenciaUsuario.objects.get_or_create(
-            usuario=usuario,
+            usuario=self.model_instance.usuario,
             defaults={"moeda_preferida": "BRL"},
         )
         return preferencia

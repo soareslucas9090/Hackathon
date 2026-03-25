@@ -38,10 +38,10 @@ def moeda_context(request):
         return {"moeda_usuario": _brl_default()}
 
     try:
-        from Usuario.configuracoes.helpers import PreferenciaUsuarioHelper
+        from Usuario.configuracoes.models import PreferenciaUsuario
         from common.currency_service import obter_cotacoes, obter_simbolo_moeda
 
-        preferencia = PreferenciaUsuarioHelper.obter_preferencia(request.user)
+        preferencia = PreferenciaUsuario(usuario=request.user).helper.obter_preferencia()
         codigo = preferencia.moeda_preferida if preferencia else "BRL"
 
         if codigo == "BRL":

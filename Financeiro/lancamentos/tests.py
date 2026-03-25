@@ -245,7 +245,7 @@ class LancamentoUpdateViewTest(BaseFinanceiroTestCase):
         response = self.client.get(
             reverse("financeiro:lancamento-editar", args=[self.outro_lancamento.pk])
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
 
 
 class LancamentoDeleteViewTest(BaseFinanceiroTestCase):
@@ -340,7 +340,7 @@ class CategoriaUpdateViewTest(BaseFinanceiroTestCase):
         response = self.client.get(
             reverse("financeiro:categoria-editar", args=[self.outro_categoria.pk])
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
 
 
 class CategoriaDeleteViewTest(BaseFinanceiroTestCase):

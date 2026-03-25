@@ -5,7 +5,7 @@
   <div class="col-12 col-lg-8">
     <div class="card shadow-sm">
       <div class="card-body">
-        <form method="post" novalidate>
+        <form method="post" novalidate id="lancamento-form">
           {% csrf_token %}
           {% for field in form %}
           <div class="mb-3">
@@ -32,4 +32,77 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  "use strict";
+
+  /**
+   * IMask — máscara monetária BR (1.234,56)
+   *
+   * Para cada input com [data-money-mask]:
+   *   1. Criamos um <input hidden> com o name original para enviar ao Django.
+   *   2. Removemos o name do input visível para que ele não seja submetido.
+   *   3. Sincronizamos o hidden com mask.typedValue (JS float) em cada digitação.
+   *      → mask.typedValue = 1234.56 → hidden.value = "1234.56" (decimal p/ Python)
+   */
+  document.addEventListener("DOMContentLoaded", function () {
+    var maskedFields = [];
+    var moneyInputs = document.querySelectorAll("[data-money-mask]");
+
+    moneyInputs.forEach(function (input) {
+      // Cria hidden que será submetido no lugar do campo mascarado
+      var hidden = document.createElement("input");
+      hidden.type = "hidden";
+      hidden.name = input.name;
+      input.removeAttribute("name");
+      input.after(hidden);
+
+      // Inicializa IMask — modo decimal BR (radix=",", milhar=".")
+      var mask = IMask(input, {
+        mask: Number,
+        scale: 2,
+        signed: false,
+        thousandsSeparator: ".",
+        padFractionalZeros: true,
+        normalizeZeros: true,
+        radix: ",",
+        mapToRadix: ["."],
+        min: 0,
+        max: 9999999999.99,
+      });
+
+      function syncHidden() {
+        var val = mask.typedValue;
+        hidden.value = (val !== undefined && val !== null && val > 0)
+          ? val.toFixed(2)
+          : "";
+      }
+
+      // Sincroniza a cada mudança de digitação
+      mask.on("accept", syncHidden);
+
+      // Sincroniza imediatamente (preenche hidden com o valor inicial na edição)
+      syncHidden();
+
+      maskedFields.push({ mask: mask, hidden: hidden });
+    });
+
+    // Garante sincronia final antes de enviar o formulário
+    var form = document.getElementById("lancamento-form");
+    if (form) {
+      form.addEventListener("submit", function () {
+        maskedFields.forEach(function (item) {
+          var val = item.mask.typedValue;
+          if (val !== undefined && val !== null && val > 0) {
+            item.hidden.value = val.toFixed(2);
+          }
+        });
+      });
+    }
+  });
+}());
+</script>
 {% endblock %}

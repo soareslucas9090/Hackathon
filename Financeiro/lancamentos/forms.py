@@ -60,6 +60,23 @@ class LancamentoForm(forms.ModelForm):
             elif not isinstance(widget, forms.CheckboxInput):
                 widget.attrs.setdefault("class", "form-control")
 
+    def clean_valor(self):
+        """
+        Fallback server-side: converte valor da máscara BR (1.234,56)
+        para o formato decimal esperado pelo Python (1234.56).
+        Necessário caso o JavaScript esteja desabilitado no client.
+        """
+        valor = self.cleaned_data.get("valor")
+        if isinstance(valor, str):
+            valor = valor.replace(".", "").replace(",", ".")
+            from decimal import Decimal, InvalidOperation
+            try:
+                return Decimal(valor)
+            except InvalidOperation:
+                from django.core.exceptions import ValidationError
+                raise ValidationError("Informe um valor monetário válido.")
+        return valor
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         if self.usuario:

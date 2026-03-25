@@ -18,6 +18,7 @@ urlpatterns = [
     path("categorias/nova/", views.CategoriaCreateView.as_view(), name="categoria-criar"),
     path("categorias/<int:pk>/editar/", views.CategoriaUpdateView.as_view(), name="categoria-editar"),
     path("categorias/<int:pk>/excluir/", views.CategoriaDeleteView.as_view(), name="categoria-excluir"),
-    # Relatório (placeholder para Passo 4)
+    # Relatório
     path("relatorio/", views.RelatorioView.as_view(), name="relatorio"),
+    path("relatorio/pdf/", views.RelatorioPDFView.as_view(), name="relatorio-pdf"),
 ]

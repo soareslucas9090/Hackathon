@@ -1,11 +1,125 @@
 {% extends "base_auth.html" %}
 
 {% block content %}
+<!-- Filtros -->
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end" id="form-relatorio">
+      <div class="col-12 col-md-2">
+        <label class="form-label small">Tipo</label>
+        <select name="tipo" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          <option value="receita" {% if filtros.tipo == "receita" %}selected{% endif %}>Receita</option>
+          <option value="despesa" {% if filtros.tipo == "despesa" %}selected{% endif %}>Despesa</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small">Categoria</label>
+        <select name="categoria" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for cat in categorias %}
+          <option value="{{ cat.pk }}" {% if filtros.categoria == cat.pk|stringformat:"s" %}selected{% endif %}>
+            {{ cat.nome }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small">De</label>
+        <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ filtros.data_inicio }}">
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small">Até</label>
+        <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ filtros.data_fim }}">
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label small">Busca</label>
+        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Descrição..." value="{{ filtros.busca }}">
+      </div>
+      <div class="col-12 col-md-2 d-flex gap-1">
+        <button type="submit" class="btn btn-sm btn-primary flex-fill">
+          <i class="bi bi-funnel"></i> Filtrar
+        </button>
+        <a href="{% url 'financeiro:relatorio' %}" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-x"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Resumo -->
+{% include "financeiro/lancamentos/partials/cards_saldo.html" %}
+
+<!-- Ações -->
+<div class="d-flex justify-content-end my-3">
+  <a href="{% url 'financeiro:relatorio-pdf' %}?{{ request.GET.urlencode }}"
+     class="btn btn-outline-danger" target="_blank">
+    <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF
+  </a>
+</div>
+
+<!-- Tabela de lançamentos -->
 <div class="card shadow-sm">
-  <div class="card-body text-center py-5">
-    <i class="bi bi-bar-chart-line display-1 text-muted"></i>
-    <h4 class="mt-3">Relatório em breve</h4>
-    <p class="text-muted">A exportação em PDF/Excel será implementada no Passo 4.</p>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Tipo</th>
+            <th class="text-end">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in lancamentos %}
+          <tr>
+            <td>{{ l.data|date:"d/m/Y" }}</td>
+            <td>{{ l.descricao }}</td>
+            <td>
+              <span class="badge rounded-pill" style="background-color:{{ l.categoria.cor }}">
+                {{ l.categoria.nome }}
+              </span>
+            </td>
+            <td>
+              {% if l.tipo == "receita" %}
+                <span class="badge bg-success">Receita</span>
+              {% else %}
+                <span class="badge bg-danger">Despesa</span>
+              {% endif %}
+            </td>
+            <td class="text-end fw-semibold {% if l.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
+              R$ {{ l.valor|floatformat:2 }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">Nenhum lançamento encontrado.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        {% if lancamentos %}
+        <tfoot class="table-light fw-semibold">
+          <tr>
+            <td colspan="4" class="text-end">Receitas:</td>
+            <td class="text-end text-success">R$ {{ saldo.receitas|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-end">Despesas:</td>
+            <td class="text-end text-danger">R$ {{ saldo.despesas|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-end">Saldo:</td>
+            <td class="text-end {% if saldo.saldo >= 0 %}text-primary{% else %}text-danger{% endif %}">
+              R$ {{ saldo.saldo|floatformat:2 }}
+            </td>
+          </tr>
+        </tfoot>
+        {% endif %}
+      </table>
+    </div>
   </div>
 </div>
 {% endblock %}

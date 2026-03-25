@@ -1,6 +1,11 @@
 """Views do módulo Financeiro."""
+import json
+from decimal import Decimal
+
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import get_template
 from django.urls import reverse_lazy
 
 from common.constants import (
@@ -18,7 +23,7 @@ from core.views import (
 )
 
 from .forms import CategoriaForm, LancamentoForm
-from .helpers import LancamentoHelper
+from .helpers import CategoriaHelper, LancamentoHelper
 from .models import Categoria, Lancamento
 
 
@@ -29,8 +34,28 @@ class DashboardView(BasicTemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["saldo"] = LancamentoHelper.calcular_saldo_usuario(self.request.user)
-        ctx["ultimos"] = LancamentoHelper.ultimos_lancamentos(self.request.user)
+        usuario = self.request.user
+        ctx["saldo"] = LancamentoHelper.calcular_saldo_usuario(usuario)
+        ctx["ultimos"] = LancamentoHelper.ultimos_lancamentos(usuario)
+
+        # dados para o gráfico de barras (receitas x despesas por mês)
+        totais_mes = LancamentoHelper.totais_por_mes(usuario)
+        ctx["grafico_meses"] = json.dumps(
+            [m["mes"].strftime("%m/%Y") for m in totais_mes]
+        )
+        ctx["grafico_receitas"] = json.dumps(
+            [float(m["receitas"]) for m in totais_mes]
+        )
+        ctx["grafico_despesas"] = json.dumps(
+            [float(m["despesas"]) for m in totais_mes]
+        )
+
+        # dados para o gráfico de rosca (despesas por categoria)
+        por_cat = list(LancamentoHelper.totais_por_categoria(usuario, tipo=Lancamento.TIPO_DESPESA))
+        ctx["grafico_cat_labels"] = json.dumps([c["categoria__nome"] for c in por_cat])
+        ctx["grafico_cat_valores"] = json.dumps([float(c["total"]) for c in por_cat])
+        ctx["grafico_cat_cores"] = json.dumps([c["categoria__cor"] for c in por_cat])
+
         ctx["page_title"] = "Dashboard"
         return ctx
 
@@ -203,10 +228,61 @@ class CategoriaDeleteView(BasicActionView):
 # ─────────────────────────────────────────── Relatório ───────────────────────
 
 class RelatorioView(BasicTemplateView):
-    """Placeholder para o Passo 4 (exportação PDF/Excel)."""
+    """Relatório com filtros, gráficos e botão de exportação PDF."""
     template_name = "financeiro/lancamentos/relatorio.html"
+
+    def _get_filtros(self):
+        """Extrai e normaliza os filtros da querystring."""
+        return {
+            "tipo": self.request.GET.get("tipo") or None,
+            "categoria": self.request.GET.get("categoria") or None,
+            "data_inicio": self.request.GET.get("data_inicio") or None,
+            "data_fim": self.request.GET.get("data_fim") or None,
+            "busca": self.request.GET.get("busca") or None,
+        }
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        usuario = self.request.user
+        filtros = self._get_filtros()
+
+        lancamentos = LancamentoHelper.listar_por_usuario(usuario, filtros)
+        saldo = LancamentoHelper.calcular_saldo_usuario_qs(lancamentos)
+
+        ctx["lancamentos"] = lancamentos
+        ctx["saldo"] = saldo
+        ctx["categorias"] = CategoriaHelper.listar_por_usuario(usuario)
+        ctx["filtros"] = self.request.GET
         ctx["page_title"] = "Relatório"
         return ctx
+
+
+class RelatorioPDFView(BasicTemplateView):
+    """Gera o relatório filtrado como PDF para download."""
+
+    def get(self, request, *args, **kwargs):
+        from xhtml2pdf import pisa
+
+        usuario = request.user
+        filtros = {
+            "tipo": request.GET.get("tipo") or None,
+            "categoria": request.GET.get("categoria") or None,
+            "data_inicio": request.GET.get("data_inicio") or None,
+            "data_fim": request.GET.get("data_fim") or None,
+            "busca": request.GET.get("busca") or None,
+        }
+        lancamentos = LancamentoHelper.listar_por_usuario(usuario, filtros)
+        saldo = LancamentoHelper.calcular_saldo_usuario_qs(lancamentos)
+
+        template = get_template("financeiro/lancamentos/relatorio_pdf.html")
+        html = template.render({
+            "lancamentos": lancamentos,
+            "saldo": saldo,
+            "filtros": request.GET,
+            "usuario": usuario,
+        }, request)
+
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = 'attachment; filename="relatorio.pdf"'
+        pisa.CreatePDF(html, dest=response)
+        return response

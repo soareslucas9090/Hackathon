@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório Financeiro</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 11px;
+      color: #1e1b4b;
+      margin: 20px;
+    }
+    h1 {
+      font-size: 16px;
+      color: #4f46e5;
+      margin-bottom: 2px;
+    }
+    .subtitulo {
+      font-size: 10px;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    thead th {
+      background-color: #4f46e5;
+      color: #fff;
+      padding: 6px 8px;
+      text-align: left;
+      font-size: 10px;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f5f3ff;
+    }
+    tbody td {
+      padding: 5px 8px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 10px;
+    }
+    tfoot td {
+      padding: 5px 8px;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    .text-right { text-align: right; }
+    .badge-receita { color: #15803d; font-weight: bold; }
+    .badge-despesa { color: #b91c1c; font-weight: bold; }
+    .resumo-box {
+      margin-top: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 10px 14px;
+      width: 260px;
+      float: right;
+    }
+    .resumo-box table {
+      margin-top: 0;
+      width: 100%;
+    }
+    .resumo-box td { border: none; padding: 3px 4px; }
+    .saldo-positivo { color: #4f46e5; }
+    .saldo-negativo { color: #b91c1c; }
+    .footer {
+      margin-top: 30px;
+      font-size: 9px;
+      color: #9ca3af;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Relatório Financeiro Pessoal</h1>
+  <div class="subtitulo">
+    Usuário: {{ usuario.get_full_name|default:usuario.username }}
+    {% if filtros.data_inicio or filtros.data_fim %}
+      &nbsp;·&nbsp;
+      Período:
+      {% if filtros.data_inicio %}{{ filtros.data_inicio }}{% else %}início{% endif %}
+      até
+      {% if filtros.data_fim %}{{ filtros.data_fim }}{% else %}hoje{% endif %}
+    {% endif %}
+    {% if filtros.tipo %}
+      &nbsp;·&nbsp;
+      Tipo: {{ filtros.tipo|capfirst }}
+    {% endif %}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Descrição</th>
+        <th>Categoria</th>
+        <th>Tipo</th>
+        <th class="text-right">Valor (R$)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in lancamentos %}
+      <tr>
+        <td>{{ l.data|date:"d/m/Y" }}</td>
+        <td>{{ l.descricao }}</td>
+        <td>{{ l.categoria.nome }}</td>
+        <td>
+          {% if l.tipo == "receita" %}
+            <span class="badge-receita">Receita</span>
+          {% else %}
+            <span class="badge-despesa">Despesa</span>
+          {% endif %}
+        </td>
+        <td class="text-right {% if l.tipo == 'receita' %}badge-receita{% else %}badge-despesa{% endif %}">
+          {{ l.valor|floatformat:2 }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="text-right">Nenhum lançamento encontrado.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="resumo-box">
+    <table>
+      <tr>
+        <td>Receitas:</td>
+        <td class="text-right badge-receita">R$ {{ saldo.receitas|floatformat:2 }}</td>
+      </tr>
+      <tr>
+        <td>Despesas:</td>
+        <td class="text-right badge-despesa">R$ {{ saldo.despesas|floatformat:2 }}</td>
+      </tr>
+      <tr>
+        <td><strong>Saldo:</strong></td>
+        <td class="text-right {% if saldo.saldo >= 0 %}saldo-positivo{% else %}saldo-negativo{% endif %}">
+          <strong>R$ {{ saldo.saldo|floatformat:2 }}</strong>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    Gerado em {% now "d/m/Y H:i" %} &nbsp;·&nbsp; FinançasPessoais
+  </div>
+
+</body>
+</html>

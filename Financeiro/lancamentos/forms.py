@@ -49,12 +49,13 @@ class LancamentoForm(forms.ModelForm):
             "tipo": forms.Select(attrs={"class": "form-select"}),
         }
 
-    def __init__(self, *args, usuario=None, taxa_moeda=None, **kwargs):
+    def __init__(self, *args, usuario=None, taxa_moeda=None, simbolo_moeda=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         verbose_original = self.instance._meta.get_field('valor').verbose_name
+        simbolo = simbolo_moeda or "R$"
 
-        self.fields['valor'].label = f"{verbose_original} ()"
+        self.fields['valor'].label = f"{verbose_original} ({simbolo})"
 
         self.usuario = usuario
         self.taxa_moeda = Decimal(str(taxa_moeda)) if taxa_moeda is not None else Decimal("1")

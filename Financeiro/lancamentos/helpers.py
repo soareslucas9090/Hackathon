@@ -175,3 +175,21 @@ class LancamentoHelper(ModelHelper):
         except Exception:
             pass
         return Decimal("1")
+
+    def obter_simbolo_moeda(self):
+        """
+        Retorna o símbolo monetário da moeda preferida do usuário.
+        Exemplo: 'R$' para BRL, 'US$' para USD, '€' para EUR.
+        Retorna 'R$' como fallback.
+        """
+        usuario = self.model_instance.usuario
+        try:
+            from Usuario.configuracoes.models import PreferenciaUsuario
+            from common.currency_service import SIMBOLOS_MOEDAS
+
+            preferencia = PreferenciaUsuario(usuario=usuario).helper.obter_preferencia()
+            codigo = preferencia.moeda_preferida if preferencia else "BRL"
+            return SIMBOLOS_MOEDAS.get(codigo, codigo)
+        except Exception:
+            pass
+        return "R$"

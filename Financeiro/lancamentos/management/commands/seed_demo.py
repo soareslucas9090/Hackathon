@@ -77,7 +77,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("=== seed_demo ==="))
         with transaction.atomic():
             for dados in USUARIOS:
-                usuario = self._criar_usuario(dados)                self._criar_preferencia(usuario)                cats = self._criar_categorias(usuario)
+                usuario = self._criar_usuario(dados)
+                self._criar_preferencia(usuario)
+                cats = self._criar_categorias(usuario)
                 total = self._criar_lancamentos(usuario, cats)
                 self.stdout.write(
                     self.style.SUCCESS(

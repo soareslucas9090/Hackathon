@@ -101,7 +101,9 @@ class LancamentoCreateView(BasicCreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["usuario"] = self.request.user
-        kwargs["taxa_moeda"] = Lancamento(usuario=self.request.user).helper.obter_taxa_moeda()
+        _helper = Lancamento(usuario=self.request.user).helper
+        kwargs["taxa_moeda"] = _helper.obter_taxa_moeda()
+        kwargs["simbolo_moeda"] = _helper.obter_simbolo_moeda()
         return kwargs
 
     def form_valid(self, form):
@@ -132,7 +134,9 @@ class LancamentoUpdateView(BasicUpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["usuario"] = self.request.user
-        kwargs["taxa_moeda"] = Lancamento(usuario=self.request.user).helper.obter_taxa_moeda()
+        _helper = Lancamento(usuario=self.request.user).helper
+        kwargs["taxa_moeda"] = _helper.obter_taxa_moeda()
+        kwargs["simbolo_moeda"] = _helper.obter_simbolo_moeda()
         return kwargs
 
     def form_valid(self, form):

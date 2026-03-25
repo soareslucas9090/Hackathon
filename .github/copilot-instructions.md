@@ -113,10 +113,12 @@ Usuario/
   autenticacao/
     views.py                 ← LandingPageView, CustomLoginView, CustomLogoutView
     urls.py                  ← namespace "usuario"
-    templates/autenticacao/
+    templates/usuario/autenticacao/
       landing.html
       login.html
-templates/                   ← base.html + core/400.html, 403.html, 404.html, 500.html
+      partials/
+        feature_card.html    ← Card de funcionalidade da landing page
+templates/                   ← base.html + base_auth.html (sidebar) + core/400.html, 403.html, 404.html, 500.html
 static/
 ```
 
@@ -172,7 +174,8 @@ class LancamentoBusiness(ModelBusiness):
 
 ## Padrões de Templates
 
-- Todos estendem `base.html` via `{% extends "base.html" %}`.
+- Páginas **autenticadas** (Financeiro) estendem `base_auth.html` via `{% extends "base_auth.html" %}` — que inclui a sidebar e extende `base.html`.
+- Páginas **públicas** (landing, login) estendem `base.html` diretamente via `{% extends "base.html" %}`.
 - Partials são incluídos via `{% include "..." %}`.
 - Componentes AJAX atualizam apenas o partial sem recarregar a página.
 - Cores do tema: Bootstrap 5 CDN + classes utilitárias.

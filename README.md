@@ -108,10 +108,11 @@ Domínio (ex: Financeiro)/
 hackathon/           ← Configurações do projeto Django
 core/                ← Classes base, exceções, mixins, constantes técnicas
 common/              ← Constantes de texto, widgets personalizados
-Financeiro/          ← Domínio financeiro (apps: lancamentos, categorias…)
+Financeiro/          ← Domínio financeiro (app: lancamentos)
 Usuario/             ← Domínio de usuário (app: autenticacao)
 templates/           ← Templates HTML organizados por app
-  base.html
+  base.html          ← Layout raiz (público: login, landing)
+  base_auth.html     ← Layout autenticado com sidebar (extends base.html)
   core/              ← Páginas de erro (400, 403, 404, 500)
 static/              ← Assets estáticos (CSS, JS, imagens)
 manage.py

@@ -503,3 +503,242 @@ class AnaliseFinanceiraViewTest(BaseFinanceiroTestCase):
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertFalse(data["success"])
+
+
+# ─────────────────────────────────────────── Importação de Planilha ──────────
+
+def _criar_xlsx_em_memoria(linhas):
+    """
+    Utilitário de teste: cria um workbook .xlsx em memória a partir de uma
+    lista de listas. A primeira linha é usada como cabeçalho.
+
+    Retorna um objeto BytesIO pronto para ser passado como request.FILES.
+    """
+    import io
+    import openpyxl
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    for row in linhas:
+        ws.append(row)
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    return SimpleUploadedFile(
+        "planilha.xlsx",
+        buffer.read(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+class DownloadModeloPlanilhaViewTest(BaseFinanceiroTestCase):
+    """Testes da DownloadModeloPlanilhaView."""
+
+    def test_get_retorna_xlsx(self):
+        response = self.client.get(reverse("financeiro:lancamento-modelo"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
+    def test_content_disposition_attachment(self):
+        response = self.client.get(reverse("financeiro:lancamento-modelo"))
+        self.assertIn("attachment", response["Content-Disposition"])
+        self.assertIn(".xlsx", response["Content-Disposition"])
+
+    def test_requer_login(self):
+        self.client.logout()
+        response = self.client.get(reverse("financeiro:lancamento-modelo"))
+        self.assertEqual(response.status_code, 302)
+
+
+class ImportarPlanilhaViewTest(BaseFinanceiroTestCase):
+    """Testes da ImportarPlanilhaView."""
+
+    URL = "financeiro:lancamento-importar"
+
+    def _post(self, arquivo, client=None):
+        c = client or self.client
+        return c.post(
+            reverse(self.URL),
+            {"arquivo": arquivo},
+            format="multipart",
+        )
+
+    # ── Casos de sucesso ──────────────────────────────────────────────────
+
+    def test_importacao_valida_cria_lancamentos(self):
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["receita", "Salário", "3000.00", date.today().isoformat(), "Alimentação", ""],
+            ["despesa", "Mercado", "250.50", date.today().isoformat(), "Alimentação", "obs"],
+        ])
+        total_antes = Lancamento.objects.filter(usuario=self.usuario).count()
+        response = self._post(arquivo)
+        data = json.loads(response.content)
+        self.assertTrue(data["success"], msg=data.get("error"))
+        self.assertEqual(
+            Lancamento.objects.filter(usuario=self.usuario).count(),
+            total_antes + 2,
+        )
+
+    def test_importacao_retorna_resumo_correto(self):
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["receita", "Salário", "3000.00", date.today().isoformat(), "Alimentação", ""],
+            ["despesa", "Mercado", "200.00", date.today().isoformat(), "Alimentação", ""],
+            ["despesa", "Aluguel", "1000.00", date.today().isoformat(), "Alimentação", ""],
+        ])
+        response = self._post(arquivo)
+        data = json.loads(response.content)
+        self.assertTrue(data["success"])
+        resultado = data["resultado"]
+        self.assertEqual(resultado["total"], 3)
+        self.assertEqual(resultado["receitas"], 1)
+        self.assertEqual(resultado["despesas"], 2)
+
+    def test_categoria_inexistente_criada_automaticamente(self):
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["receita", "Bônus", "500.00", date.today().isoformat(), "Bonificações", ""],
+        ])
+        self.assertFalse(
+            Categoria.objects.filter(nome="Bonificações", usuario=self.usuario).exists()
+        )
+        response = self._post(arquivo)
+        data = json.loads(response.content)
+        self.assertTrue(data["success"])
+        self.assertTrue(
+            Categoria.objects.filter(nome="Bonificações", usuario=self.usuario).exists()
+        )
+
+    def test_categoria_com_acento_diferente_encontra_existente(self):
+        """'Alimentacao' (sem acento) deve encontrar a categoria 'Alimentação'."""
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["receita", "Salário", "3000.00", date.today().isoformat(), "Alimentacao", ""],
+        ])
+        total_cats_antes = Categoria.objects.filter(usuario=self.usuario).count()
+        response = self._post(arquivo)
+        data = json.loads(response.content)
+        self.assertTrue(data["success"])
+        # Não deve ter criado nova categoria
+        self.assertEqual(
+            Categoria.objects.filter(usuario=self.usuario).count(),
+            total_cats_antes,
+        )
+
+    def test_categoria_case_insensitive(self):
+        """'ALIMENTAÇÃO' (maiúsculas) deve encontrar a categoria 'Alimentação'."""
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["despesa", "Compras", "80.00", date.today().isoformat(), "ALIMENTAÇÃO", ""],
+        ])
+        total_cats_antes = Categoria.objects.filter(usuario=self.usuario).count()
+        response = self._post(arquivo)
+        data = json.loads(response.content)
+        self.assertTrue(data["success"])
+        self.assertEqual(
+            Categoria.objects.filter(usuario=self.usuario).count(),
+            total_cats_antes,
+        )
+
+    # ── Casos de erro ─────────────────────────────────────────────────────
+
+    def test_tipo_invalido_retorna_400(self):
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["investimento", "Ação XPTO", "500.00", date.today().isoformat(), "Alimentação", ""],
+        ])
+        total_antes = Lancamento.objects.filter(usuario=self.usuario).count()
+        response = self._post(arquivo)
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])
+        # Nenhum lançamento deve ter sido criado (atomicidade)
+        self.assertEqual(
+            Lancamento.objects.filter(usuario=self.usuario).count(),
+            total_antes,
+        )
+
+    def test_valor_invalido_cancela_importacao(self):
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["receita", "Salário", "0", date.today().isoformat(), "Alimentação", ""],
+        ])
+        total_antes = Lancamento.objects.filter(usuario=self.usuario).count()
+        response = self._post(arquivo)
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])
+        self.assertEqual(
+            Lancamento.objects.filter(usuario=self.usuario).count(),
+            total_antes,
+        )
+
+    def test_atomicidade_erro_na_linha_3_cancela_tudo(self):
+        """Se a linha 3 tem erro, as linhas 1 e 2 NÃO devem ser persistidas."""
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["receita", "Linha 1 ok", "100.00", date.today().isoformat(), "Alimentação", ""],
+            ["despesa", "Linha 2 ok", "50.00",  date.today().isoformat(), "Alimentação", ""],
+            ["invalido", "Linha 3 erro", "80.00", date.today().isoformat(), "Alimentação", ""],
+        ])
+        total_antes = Lancamento.objects.filter(usuario=self.usuario).count()
+        response = self._post(arquivo)
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])
+        # Exatamente 0 novos lançamentos
+        self.assertEqual(
+            Lancamento.objects.filter(usuario=self.usuario).count(),
+            total_antes,
+        )
+
+    def test_formato_invalido_nao_xlsx(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        arquivo_csv = SimpleUploadedFile(
+            "dados.csv", b"tipo,descricao\nreceita,Salario", content_type="text/csv"
+        )
+        response = self._post(arquivo_csv)
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertFalse(data["success"])
+
+    def test_requer_login(self):
+        self.client.logout()
+        from datetime import date
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["receita", "Salário", "3000.00", date.today().isoformat(), "Alimentação", ""],
+        ])
+        response = self._post(arquivo)
+        self.assertEqual(response.status_code, 302)
+
+    def test_nao_usa_categoria_de_outro_usuario(self):
+        """Categoria criada para outro usuário não deve ser reutilizada."""
+        from datetime import date
+        # "Moradia" exists only for outro_usuario
+        arquivo = _criar_xlsx_em_memoria([
+            ["tipo", "descricao", "valor", "data", "categoria", "observacao"],
+            ["despesa", "Aluguel", "1200.00", date.today().isoformat(), "Moradia", ""],
+        ])
+        total_cats_antes = Categoria.objects.filter(usuario=self.usuario).count()
+        response = self._post(arquivo)
+        data = json.loads(response.content)
+        self.assertTrue(data["success"])
+        # Deve ter criado uma nova categoria "Moradia" para o usuario logado
+        self.assertEqual(
+            Categoria.objects.filter(usuario=self.usuario).count(),
+            total_cats_antes + 1,
+        )

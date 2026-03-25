@@ -356,3 +356,81 @@ class RelatorioPDFView(BasicTemplateView):
         response["Content-Disposition"] = 'attachment; filename="relatorio.pdf"'
         pisa.CreatePDF(html, dest=response)
         return response
+
+
+# ─────────────────────────────── Importação de Planilha ──────────────────────
+
+class DownloadModeloPlanilhaView(BasicActionView):
+    """Gera e retorna o modelo de planilha (.xlsx) para download."""
+
+    def get(self, request, *args, **kwargs):
+        import io
+        import openpyxl
+        from datetime import date
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Lançamentos"
+
+        # Cabeçalho
+        ws.append(["tipo", "descricao", "valor", "data", "categoria", "observacao"])
+
+        # Exemplos de preenchimento
+        ws.append([
+            "receita",
+            "Salário mensal",
+            "3500.00",
+            date.today().strftime("%Y-%m-%d"),
+            "Salário",
+            "",
+        ])
+        ws.append([
+            "despesa",
+            "Supermercado",
+            "250.00",
+            date.today().strftime("%Y-%m-%d"),
+            "Alimentação",
+            "Compras da semana",
+        ])
+
+        # Ajusta largura das colunas
+        for col_cells in ws.columns:
+            max_len = max(len(str(c.value or "")) for c in col_cells)
+            ws.column_dimensions[col_cells[0].column_letter].width = max(max_len + 4, 14)
+
+        buffer = io.BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+
+        response = HttpResponse(
+            buffer.read(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = 'attachment; filename="modelo_lancamentos.xlsx"'
+        return response
+
+
+class ImportarPlanilhaView(BasicActionView):
+    """Recebe uma planilha .xlsx e importa os lançamentos atomicamente."""
+
+    def post(self, request, *args, **kwargs):
+        from core.exceptions import ProcessException
+
+        arquivo = request.FILES.get("arquivo")
+        if not arquivo:
+            return self.json_error(_("Nenhum arquivo enviado."))
+
+        nome = arquivo.name.lower()
+        if not nome.endswith(".xlsx"):
+            return self.json_error(
+                _("Formato inválido. Envie um arquivo .xlsx.")
+            )
+
+        _proxy = Lancamento(usuario=request.user)
+        resultado = _proxy.business.importar_planilha(arquivo)
+
+        mensagem = _(
+            "%(total)s lançamento(s) importado(s): %(receitas)s receita(s) e %(despesas)s despesa(s)."
+        ) % resultado
+
+        return self.json_success({"message": str(mensagem), "resultado": resultado})

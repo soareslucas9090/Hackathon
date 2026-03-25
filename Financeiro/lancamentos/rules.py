@@ -77,3 +77,15 @@ class LancamentoRules(ModelRules):
                 _("Não há lançamentos nos últimos 3 meses para gerar a análise.")
             )
         return False
+
+    def validar_tipo(self):
+        """Valida que o tipo do lançamento é 'receita' ou 'despesa'."""
+        from .models import Lancamento
+
+        tipos_validos = [Lancamento.TIPO_RECEITA, Lancamento.TIPO_DESPESA]
+        if self.model_instance.tipo not in tipos_validos:
+            raise BusinessRulesExceptions(
+                _("Tipo inválido '%(tipo)s'. Use 'receita' ou 'despesa'.")
+                % {"tipo": self.model_instance.tipo}
+            )
+        return False

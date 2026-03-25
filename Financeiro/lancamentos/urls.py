@@ -14,6 +14,8 @@ urlpatterns = [
     # Lançamentos
     path("lancamentos/", views.LancamentoListView.as_view(), name="lancamento-lista"),
     path("lancamentos/novo/", views.LancamentoCreateView.as_view(), name="lancamento-criar"),
+    path("lancamentos/importar/", views.ImportarPlanilhaView.as_view(), name="lancamento-importar"),
+    path("lancamentos/modelo/", views.DownloadModeloPlanilhaView.as_view(), name="lancamento-modelo"),
     path("lancamentos/<int:pk>/editar/", views.LancamentoUpdateView.as_view(), name="lancamento-editar"),
     path("lancamentos/<int:pk>/excluir/", views.LancamentoDeleteView.as_view(), name="lancamento-excluir"),
     # Categorias

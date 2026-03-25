@@ -50,10 +50,77 @@
 </div>
 
 <!-- Ações -->
-<div class="d-flex justify-content-end mb-3">
+<div class="d-flex justify-content-end mb-3 gap-2">
+  <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalImportarPlanilha">
+    <i class="bi bi-file-earmark-arrow-up me-1"></i>{% trans "Importar Planilha" %}
+  </button>
   <a href="{% url 'financeiro:lancamento-criar' %}" class="btn btn-primary">
     <i class="bi bi-plus-lg me-1"></i>{% trans "Novo Lançamento" %}
   </a>
+</div>
+
+<!-- Modal: Importar Planilha -->
+<div class="modal fade" id="modalImportarPlanilha" tabindex="-1" aria-labelledby="modalImportarPlanilhaLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalImportarPlanilhaLabel">
+          <i class="bi bi-file-earmark-excel me-2 text-success"></i>{% trans "Importar Planilha" %}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans "Fechar" %}"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Download do modelo -->
+        <div class="alert alert-info d-flex align-items-center gap-2 mb-3">
+          <i class="bi bi-info-circle-fill flex-shrink-0"></i>
+          <div>
+            {% trans "Baixe o modelo antes de preencher." %}
+            <a href="{% url 'financeiro:lancamento-modelo' %}" class="alert-link ms-1" download>
+              <i class="bi bi-download me-1"></i>{% trans "Baixar modelo .xlsx" %}
+            </a>
+          </div>
+        </div>
+
+        <!-- Instruções rápidas -->
+        <ul class="small text-muted mb-3">
+          <li>{% trans "Coluna 'tipo': utilize apenas" %} <strong>receita</strong> {% trans "ou" %} <strong>despesa</strong>.</li>
+          <li>{% trans "Coluna 'categoria': será buscada por nome (sem distinção de maiúsculas/acentos). Se não existir, será criada automaticamente." %}</li>
+          <li>{% trans "Coluna 'data': formato AAAA-MM-DD ou DD/MM/AAAA." %}</li>
+          <li>{% trans "Qualquer erro cancela toda a importação." %}</li>
+        </ul>
+
+        <!-- Formulário de upload -->
+        <form id="formImportarPlanilha" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="inputArquivoPlanilha" class="form-label">{% trans "Arquivo da planilha (.xlsx)" %}</label>
+            <input type="file"
+                   class="form-control"
+                   id="inputArquivoPlanilha"
+                   name="arquivo"
+                   accept=".xlsx"
+                   required>
+          </div>
+        </form>
+
+        <!-- Área de feedback -->
+        <div id="feedbackImportar" class="d-none">
+          <div id="feedbackImportarSpinner" class="text-center d-none py-2">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+            <span class="text-muted">{% trans "Importando..." %}</span>
+          </div>
+          <div id="feedbackImportarSucesso" class="alert alert-success d-none"></div>
+          <div id="feedbackImportarErro" class="alert alert-danger d-none"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cancelar" %}</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmarImportar">
+          <i class="bi bi-upload me-1"></i>{% trans "Importar" %}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Tabela (refreshável via AJAX) -->
@@ -76,5 +143,84 @@ document.getElementById("form-filtros").addEventListener("submit", function (e) 
     .catch(() => this.submit());
 });
 
+/* ── Importar Planilha AJAX ────────────────────────────────────────────── */
+(function () {
+  const btnConfirmar = document.getElementById("btnConfirmarImportar");
+  const formImportar = document.getElementById("formImportarPlanilha");
+  const areaFeedback = document.getElementById("feedbackImportar");
+  const spinner = document.getElementById("feedbackImportarSpinner");
+  const alertSucesso = document.getElementById("feedbackImportarSucesso");
+  const alertErro = document.getElementById("feedbackImportarErro");
+
+  function resetFeedback() {
+    areaFeedback.classList.add("d-none");
+    spinner.classList.add("d-none");
+    alertSucesso.classList.add("d-none");
+    alertErro.classList.add("d-none");
+    alertSucesso.textContent = "";
+    alertErro.textContent = "";
+  }
+
+  function recarregarTabela() {
+    fetch("{% url 'financeiro:lancamento-lista' %}", {
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+      .then(r => r.text())
+      .then(html => { document.getElementById("tabela-lancamentos").innerHTML = html; })
+      .catch(() => {});
+  }
+
+  // Limpa o feedback ao abrir o modal
+  document.getElementById("modalImportarPlanilha").addEventListener("show.bs.modal", function () {
+    resetFeedback();
+    formImportar.reset();
+    btnConfirmar.disabled = false;
+  });
+
+  btnConfirmar.addEventListener("click", function () {
+    const arquivo = document.getElementById("inputArquivoPlanilha").files[0];
+    if (!arquivo) {
+      resetFeedback();
+      areaFeedback.classList.remove("d-none");
+      alertErro.classList.remove("d-none");
+      alertErro.textContent = "{% trans "Selecione um arquivo .xlsx antes de importar." %}";
+      return;
+    }
+
+    resetFeedback();
+    areaFeedback.classList.remove("d-none");
+    spinner.classList.remove("d-none");
+    btnConfirmar.disabled = true;
+
+    const formData = new FormData(formImportar);
+    const csrfToken = formData.get("csrfmiddlewaretoken");
+
+    fetch("{% url 'financeiro:lancamento-importar' %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": csrfToken },
+      body: formData,
+    })
+      .then(r => r.json())
+      .then(data => {
+        spinner.classList.add("d-none");
+        btnConfirmar.disabled = false;
+        if (data.success) {
+          alertSucesso.classList.remove("d-none");
+          alertSucesso.textContent = data.message || "{% trans "Importação concluída com sucesso." %}";
+          formImportar.reset();
+          recarregarTabela();
+        } else {
+          alertErro.classList.remove("d-none");
+          alertErro.textContent = data.error || "{% trans "Erro ao importar a planilha." %}";
+        }
+      })
+      .catch(() => {
+        spinner.classList.add("d-none");
+        btnConfirmar.disabled = false;
+        alertErro.classList.remove("d-none");
+        alertErro.textContent = "{% trans "Erro de conexão. Tente novamente." %}";
+      });
+  });
+})();
 </script>
 {% endblock %}

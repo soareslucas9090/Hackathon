@@ -218,3 +218,170 @@ class LancamentoBusiness(ModelBusiness):
             raise SystemErrorException(
                 _("Erro inesperado ao gerar análise financeira.")
             ) from exc
+
+    def importar_planilha(self, arquivo):
+        """
+        Processa uma planilha Excel (.xlsx) e cria os lançamentos em lote.
+
+        Regras:
+        - Processamento totalmente atômico: qualquer erro cancela tudo.
+        - Tipo deve ser exatamente 'receita' ou 'despesa' (case-insensitive, trim).
+        - Categoria buscada por nome normalizado (sem acento, case-insensitive).
+        - Categoria inexistente é criada automaticamente com cor padrão.
+        - Valor deve ser positivo (> 0).
+        - Data aceita datetime do Excel ou string ISO 'YYYY-MM-DD' / 'DD/MM/YYYY'.
+
+        Retorna dict: {'total': N, 'receitas': X, 'despesas': Y}.
+        """
+        import openpyxl
+        from decimal import Decimal, InvalidOperation
+        from datetime import date, datetime
+        from .models import Categoria, Lancamento
+
+        usuario = self.model_instance.usuario
+
+        try:
+            with transaction.atomic():
+                wb = openpyxl.load_workbook(arquivo, read_only=True, data_only=True)
+                ws = wb.active
+
+                contagem_receitas = 0
+                contagem_despesas = 0
+                linhas_processadas = 0
+
+                _proxy_cat = Categoria(usuario=usuario)
+
+                for numero_linha, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+                    # Ignora linhas completamente vazias
+                    if not any(cell is not None and str(cell).strip() != "" for cell in row):
+                        continue
+
+                    # Garante 6 colunas (tipo, descricao, valor, data, categoria, observacao)
+                    cols = list(row) + [None] * 6
+                    tipo_raw = cols[0]
+                    descricao_raw = cols[1]
+                    valor_raw = cols[2]
+                    data_raw = cols[3]
+                    categoria_raw = cols[4]
+                    observacao_raw = cols[5]
+
+                    # ── Tipo ──────────────────────────────────────────────
+                    if tipo_raw is None:
+                        raise ProcessException(
+                            _("Linha %(linha)s: o campo 'tipo' está vazio.")
+                            % {"linha": numero_linha}
+                        )
+                    tipo = str(tipo_raw).strip().lower()
+                    if tipo not in (Lancamento.TIPO_RECEITA, Lancamento.TIPO_DESPESA):
+                        raise ProcessException(
+                            _("Linha %(linha)s: tipo '%(tipo)s' é inválido. Use 'receita' ou 'despesa'.")
+                            % {"linha": numero_linha, "tipo": str(tipo_raw).strip()}
+                        )
+
+                    # ── Descrição ─────────────────────────────────────────
+                    if not descricao_raw or str(descricao_raw).strip() == "":
+                        raise ProcessException(
+                            _("Linha %(linha)s: o campo 'descricao' está vazio.")
+                            % {"linha": numero_linha}
+                        )
+                    descricao = str(descricao_raw).strip()
+
+                    # ── Valor ─────────────────────────────────────────────
+                    if valor_raw is None:
+                        raise ProcessException(
+                            _("Linha %(linha)s: o campo 'valor' está vazio.")
+                            % {"linha": numero_linha}
+                        )
+                    try:
+                        valor = Decimal(str(valor_raw).strip().replace(",", "."))
+                    except InvalidOperation:
+                        raise ProcessException(
+                            _("Linha %(linha)s: valor '%(valor)s' não é um número válido.")
+                            % {"linha": numero_linha, "valor": valor_raw}
+                        )
+                    if valor <= 0:
+                        raise ProcessException(
+                            _("Linha %(linha)s: o valor deve ser maior que zero.")
+                            % {"linha": numero_linha}
+                        )
+
+                    # ── Data ──────────────────────────────────────────────
+                    if data_raw is None:
+                        raise ProcessException(
+                            _("Linha %(linha)s: o campo 'data' está vazio.")
+                            % {"linha": numero_linha}
+                        )
+                    if isinstance(data_raw, (date, datetime)):
+                        data_lancamento = data_raw if isinstance(data_raw, date) and not isinstance(data_raw, datetime) else data_raw.date()
+                    else:
+                        data_str = str(data_raw).strip()
+                        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+                            try:
+                                data_lancamento = datetime.strptime(data_str, fmt).date()
+                                break
+                            except ValueError:
+                                continue
+                        else:
+                            raise ProcessException(
+                                _("Linha %(linha)s: data '%(data)s' inválida. Use AAAA-MM-DD ou DD/MM/AAAA.")
+                                % {"linha": numero_linha, "data": data_raw}
+                            )
+
+                    # ── Categoria ─────────────────────────────────────────
+                    if not categoria_raw or str(categoria_raw).strip() == "":
+                        raise ProcessException(
+                            _("Linha %(linha)s: o campo 'categoria' está vazio.")
+                            % {"linha": numero_linha}
+                        )
+                    nome_cat = str(categoria_raw).strip()
+                    categoria = _proxy_cat.helper.buscar_por_nome_normalizado(nome_cat)
+                    if categoria is None:
+                        categoria = Categoria.objects.create(
+                            nome=nome_cat,
+                            cor="#6366f1",
+                            usuario=usuario,
+                        )
+
+                    # ── Observação (opcional) ─────────────────────────────
+                    observacao = str(observacao_raw).strip() if observacao_raw else ""
+
+                    # ── Criação do Lançamento ──────────────────────────────
+                    lancamento = Lancamento(
+                        tipo=tipo,
+                        descricao=descricao,
+                        valor=valor,
+                        data=data_lancamento,
+                        categoria=categoria,
+                        usuario=usuario,
+                        observacao=observacao,
+                    )
+                    lancamento.rules.validar_valor()
+                    lancamento.rules.validar_tipo()
+                    lancamento.rules.validar_categoria_do_usuario()
+                    lancamento.save()
+
+                    linhas_processadas += 1
+                    if tipo == Lancamento.TIPO_RECEITA:
+                        contagem_receitas += 1
+                    else:
+                        contagem_despesas += 1
+
+                wb.close()
+
+                if linhas_processadas == 0:
+                    raise ProcessException(
+                        _("A planilha não contém linhas de dados válidas.")
+                    )
+
+                return {
+                    "total": linhas_processadas,
+                    "receitas": contagem_receitas,
+                    "despesas": contagem_despesas,
+                }
+
+        except (BusinessRulesExceptions, ProcessException):
+            raise
+        except Exception as exc:
+            raise SystemErrorException(
+                _("Erro inesperado ao importar a planilha.")
+            ) from exc

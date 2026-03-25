@@ -26,6 +26,31 @@ class CategoriaHelper(ModelHelper):
             qs = qs.filter(nome__icontains=busca)
         return qs
 
+    def buscar_por_nome_normalizado(self, nome):
+        """
+        Busca uma categoria pelo nome, ignorando maiúsculas/minúsculas e acentos.
+
+        Aplica trim + lowercase + remoção de acentos tanto no parâmetro
+        quanto nos nomes das categorias existentes, maximizando a chance
+        de encontrar uma categoria já cadastrada.
+
+        Retorna a instância de Categoria encontrada ou None.
+        """
+        import unicodedata
+        from .models import Categoria
+
+        def normalizar(texto):
+            texto = texto.strip().lower()
+            texto = unicodedata.normalize("NFD", texto)
+            return texto.encode("ascii", "ignore").decode("ascii")
+
+        nome_normalizado = normalizar(nome)
+        categorias = Categoria.objects.filter(usuario=self.model_instance.usuario)
+        for cat in categorias:
+            if normalizar(cat.nome) == nome_normalizado:
+                return cat
+        return None
+
 
 class LancamentoHelper(ModelHelper):
     """Helpers de consulta para Lançamento."""

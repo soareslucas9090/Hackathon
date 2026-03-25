@@ -54,7 +54,6 @@ View → Business → Rules
 
 ### Helper
 - Herda `ModelHelper` (`core.mixins`).
-- Contém apenas métodos `@staticmethod` de leitura.
 - **Nunca** grava dados nem lança exceções de negócio.
 - Nunca instanciar manualmente ou criar métodos estáticos.
 
@@ -266,7 +265,7 @@ except Exception as exc:
 - [ ] `AppConfig.ready()` injeta as classes
 - [ ] Business usa `transaction.atomic()` + padrão de exceções
 - [ ] Rules retorna `False` ou lança `BusinessRulesExceptions`
-- [ ] Helper é read-only, métodos `@staticmethod`
+- [ ] Helper não deve conter `@staticmethod`
 - [ ] Views herdam de `BasicView` do `core.views`
 - [ ] Todo queryset filtra por `usuario=request.user`
 - [ ] Nenhum type hint em arquivos Python

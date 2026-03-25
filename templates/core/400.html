@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}400 — Requisição inválida{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <h1 class="display-1 fw-bold text-warning">400</h1>
+        <h2 class="mb-3">Requisição inválida</h2>
+        <p class="text-muted mb-4">
+            {{ error|default:"A requisição não pôde ser processada por uma regra de negócio." }}
+        </p>
+        <a href="javascript:history.back()" class="btn btn-primary">Voltar</a>
+    </div>
+</div>
+{% endblock %}

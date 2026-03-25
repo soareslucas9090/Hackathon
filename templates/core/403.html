@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}403 — Acesso negado{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <h1 class="display-1 fw-bold text-danger">403</h1>
+        <h2 class="mb-3">Acesso negado</h2>
+        <p class="text-muted mb-4">
+            {{ error|default:"Você não tem permissão para acessar este recurso." }}
+        </p>
+        <a href="/" class="btn btn-primary">Ir para o início</a>
+    </div>
+</div>
+{% endblock %}

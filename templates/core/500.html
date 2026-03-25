@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}500 — Erro interno{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <h1 class="display-1 fw-bold text-danger">500</h1>
+        <h2 class="mb-3">Erro interno do servidor</h2>
+        <p class="text-muted mb-4">
+            {{ error|default:"Ocorreu um erro inesperado. Por favor, entre em contato com o suporte." }}
+        </p>
+        <a href="/" class="btn btn-primary">Ir para o início</a>
+    </div>
+</div>
+{% endblock %}

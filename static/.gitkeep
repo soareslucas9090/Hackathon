@@ -1,0 +1,7 @@
+# Placeholder — Os assets do template Dasher (Bootstrap, CSS, JS) serão
+# colocados aqui no Passo 3, quando o módulo Financeiro for construído.
+# Estrutura esperada:
+#   static/
+#     css/style.css
+#     vendor/bootstrap/css/bootstrap.min.css
+#     vendor/bootstrap/js/bootstrap.bundle.min.js

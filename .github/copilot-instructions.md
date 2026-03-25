@@ -16,6 +16,16 @@ Ao me responder, comece SEMPRE com a frase: *"✅ Código validado frente aos re
 **Gestão Financeira Pessoal** — Django 6.0.3, Python 3.x, SQLite.
 Projeto desenvolvido para o Hackathon **Ctrl+Alt+AI: Hackeando a Rotina de Programação** (M2A / IntGest).
 
+### Recursos Implementados
+
+| Recurso | Detalhe |
+|---|---|
+| 🤖 **Análise de IA** | `LancamentoBusiness.gerar_analise_financeira()` chama a OpenAI (`OPENAI_API_KEY` + `OPENAI_MODEL` no `.env`) com os dados dos últimos 3 meses. Resultado renderizado em Markdown e exportável em PDF. |
+| 🌙 **Modo noturno / claro** | Bootstrap 5 `data-bs-theme` — preferência salva em `localStorage`; transição suave via CSS. Implementado em `base.html`. |
+| 🌍 **i18n pt-br / en** | `LocaleMiddleware` + `i18n_patterns`; URLs prefixadas (`/pt-br/`, `/en/`); arquivo de tradução em `locale/en/`. Troca de idioma via `POST /i18n/set_language/`. |
+| 💱 **Múltiplas moedas** | `common/currency_service.py` consome a AwesomeAPI (cache 1 min em `data/cotacoes.json`). `common/context_processors.py` injeta `moeda_usuario` em todos os templates. Preferência salva em `Usuario/configuracoes`. |
+| 📄 **Exportação PDF** | Relatório filtrado (`RelatorioPDFView`) e análise de IA (`AnaliseFinanceiraPDFView`) — ambos via `xhtml2pdf`. O PDF da análise converte Markdown → HTML via pacote `markdown` antes de renderizar. |
+
 ---
 
 ## Regras Absolutas
@@ -85,11 +95,18 @@ core/
 common/
   constants.py               ← Mensagens de texto do sistema
   widgets.py                 ← Widgets Django personalizados
+  currency_service.py        ← Integração AwesomeAPI + cache local de cotações (data/cotacoes.json)
+  context_processors.py      ← Injeta moeda_usuario em todos os templates
+  templatetags/moeda_tags.py ← Tag {{ valor|moeda }} e filtros de conversão
+data/
+  cotacoes.json              ← Cache de cotações (TTL 1 min, atualizado por currency_service)
+locale/
+  en/LC_MESSAGES/            ← Tradução do sistema para inglês (django.po + django.mo)
 Financeiro/
   lancamentos/
     models.py                ← Categoria, Lancamento
-    views.py                 ← DashboardView, LancamentoListView, ...
-    business.py              ← CategoriaBusiness, LancamentoBusiness
+    views.py                 ← DashboardView, LancamentoListView, AnaliseFinanceiraView, AnaliseFinanceiraPDFView, …
+    business.py              ← CategoriaBusiness, LancamentoBusiness (incl. gerar_analise_financeira via OpenAI)
     helpers.py               ← CategoriaHelper, LancamentoHelper
     rules.py                 ← CategoriaRules, LancamentoRules
     forms.py                 ← CategoriaForm, LancamentoForm
@@ -106,6 +123,7 @@ Financeiro/
       categoria_form.html
       relatorio.html
       relatorio_pdf.html
+      analise_pdf.html       ← Template PDF da análise de IA
       partials/
         cards_saldo.html
         lancamento_tabela.html
@@ -119,7 +137,13 @@ Usuario/
       login.html
       partials/
         feature_card.html    ← Card de funcionalidade da landing page
-templates/                   ← base.html + base_auth.html (sidebar) + core/400.html, 403.html, 404.html, 500.html
+  configuracoes/
+    models.py                ← PreferenciaUsuario (moeda_preferida 1:1 com User)
+    views.py                 ← ConfiguracaoMoedaView
+    urls.py                  ← namespace "configuracoes"
+    templates/usuario/configuracoes/
+      configuracao_moeda.html
+templates/                   ← base.html (dark/light mode + seletor de idioma) + base_auth.html (sidebar) + core/400.html, 403.html, 404.html, 500.html
 static/
 ```
 

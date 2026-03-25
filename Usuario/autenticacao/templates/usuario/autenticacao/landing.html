@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Gestão Financeira Pessoal — Simplifique sua vida financeira{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ─── Hero ─── */
+    .hero {
+        background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 60%, #818cf8 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    .hero-brand { color: #c7d2fe; font-size: 1.3rem; font-weight: 700; }
+    .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.15; }
+    .hero-subtitle { font-size: 1.15rem; opacity: .85; max-width: 520px; }
+    .btn-hero-primary {
+        background: #fff;
+        color: #4f46e5;
+        font-weight: 700;
+        padding: .75rem 2rem;
+        border-radius: 2rem;
+        border: none;
+        transition: transform .2s, box-shadow .2s;
+    }
+    .btn-hero-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,.3);
+        color: #3730a3;
+    }
+    /* ─── Features ─── */
+    .feature-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 2px 16px rgba(79,70,229,.08);
+        transition: transform .2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); }
+    .feature-icon {
+        width: 56px; height: 56px; border-radius: 1rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem;
+    }
+    /* ─── Stats ─── */
+    .stat-card {
+        background: linear-gradient(135deg, #4f46e5, #818cf8);
+        border-radius: 1rem; color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- ─── Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar hero px-4 px-md-5 py-4" style="min-height: auto; flex-direction: row; background: transparent;">
+    <span class="hero-brand">
+        <i class="bi bi-wallet2 me-2"></i>FinançasPessoais
+    </span>
+    <a href="{% url 'usuario:login' %}" class="btn btn-outline-light btn-sm px-4 rounded-pill">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
+    </a>
+</nav>
+
+<!-- ─── Hero Section ──────────────────────────────────────────────────────── -->
+<section class="hero text-white px-4 px-md-5 pb-5" style="min-height: auto; flex-grow:1;">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="badge bg-white text-primary fw-semibold mb-3 px-3 py-2 rounded-pill">
+                    <i class="bi bi-stars me-1"></i> Hackathon Ctrl+Alt+AI
+                </span>
+                <h1 class="hero-title mb-4">
+                    Controle suas finanças<br>
+                    <span style="color:#a5b4fc;">com inteligência.</span>
+                </h1>
+                <p class="hero-subtitle mb-5">
+                    Registre receitas e despesas, visualize seu saldo em tempo real
+                    e tome decisões financeiras com clareza — tudo num só lugar.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'usuario:login' %}" class="btn-hero-primary btn">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Começar agora
+                    </a>
+                    <a href="#features" class="btn btn-outline-light px-4 rounded-pill">
+                        Ver recursos <i class="bi bi-chevron-down ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                <!-- Ilustração simbólica ─ cards de métricas -->
+                <div class="d-flex flex-column gap-3" style="width:320px;">
+                    <div class="stat-card p-4">
+                        <p class="mb-1 small opacity-75">Saldo atual</p>
+                        <h3 class="fw-bold mb-0">R$ 4.850,00</h3>
+                        <span class="small opacity-75"><i class="bi bi-arrow-up me-1"></i>+12% este mês</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
+                                <i class="bi bi-arrow-up-circle fs-3" style="color:#86efac;"></i>
+                                <p class="mt-2 mb-0 small fw-semibold">Receitas</p>
+                                <span class="small opacity-75">R$ 7.200</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
+                                <i class="bi bi-arrow-down-circle fs-3" style="color:#fca5a5;"></i>
+                                <p class="mt-2 mb-0 small fw-semibold">Despesas</p>
+                                <span class="small opacity-75">R$ 2.350</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Features ─────────────────────────────────────────────────────────── -->
+<section id="features" class="py-6 bg-white py-5">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold" style="color:#1e1b4b;">Tudo que você precisa</h2>
+            <p class="text-muted">Recursos simples e poderosos para o seu dia a dia financeiro.</p>
+        </div>
+        <div class="row g-4">
+
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-arrow-up-circle" icon_bg="bg-success bg-opacity-10" icon_color="text-success" title="Receitas" desc="Registre entradas de dinheiro com categoria, data e descrição." %}
+
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-arrow-down-circle" icon_bg="bg-danger bg-opacity-10" icon_color="text-danger" title="Despesas" desc="Controle seus gastos e saiba exatamente para onde vai seu dinheiro." %}
+
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-tags" icon_bg="bg-primary bg-opacity-10" icon_color="text-primary" title="Categorias" desc="Organize lançamentos por categoria para identificar padrões." %}
+
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-speedometer2" icon_bg="bg-warning bg-opacity-10" icon_color="text-warning" title="Dashboard" desc="Painel visual com saldo atualizado, gráficos e resumo do período." %}
+
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-file-earmark-bar-graph" icon_bg="bg-info bg-opacity-10" icon_color="text-info" title="Relatórios" desc="Filtre por período, categoria e exporte em PDF." %}
+
+            {% include "usuario/autenticacao/partials/feature_card.html" with icon="bi-shield-lock" icon_bg="bg-secondary bg-opacity-10" icon_color="text-secondary" title="Privacidade" desc="Seus dados são visíveis apenas para você — segurança garantida." %}
+
+        </div>
+    </div>
+</section>
+
+<!-- ─── CTA Final ─────────────────────────────────────────────────────────── -->
+<section class="py-5 text-center" style="background: linear-gradient(135deg,#1e1b4b,#4f46e5); color:#fff;">
+    <div class="container py-3">
+        <h2 class="fw-bold mb-3">Pronto para começar?</h2>
+        <p class="mb-4 opacity-75">Acesse agora e tenha controle total das suas finanças.</p>
+        <a href="{% url 'usuario:login' %}" class="btn-hero-primary btn fs-6">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Fazer login
+        </a>
+    </div>
+</section>
+
+<!-- ─── Footer ────────────────────────────────────────────────────────────── -->
+<footer class="text-center py-3 text-muted small bg-white border-top">
+    Gestão Financeira Pessoal &copy; {% now "Y" %} — Hackathon Ctrl+Alt+AI
+</footer>
+
+{% endblock %}

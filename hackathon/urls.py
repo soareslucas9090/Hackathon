@@ -23,6 +23,8 @@ urlpatterns = [
     path("", include("Usuario.autenticacao.urls")),
     # Módulo Financeiro
     path("financeiro/", include("Financeiro.lancamentos.urls")),
+    # Módulo de Configurações do Usuário
+    path("configuracoes/", include("Usuario.configuracoes.urls")),
 ]
 
 # ─── Handlers de erro personalizados ────────────────────────────────────────

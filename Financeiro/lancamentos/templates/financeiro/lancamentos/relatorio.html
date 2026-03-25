@@ -70,7 +70,7 @@
             <th>Descrição</th>
             <th>Categoria</th>
             <th>Tipo</th>
-            <th class="text-end">Valor</th>
+            <th class="text-end">Valor ({{ moeda_usuario.codigo }})</th>
           </tr>
         </thead>
         <tbody>
@@ -91,7 +91,7 @@
               {% endif %}
             </td>
             <td class="text-end fw-semibold {% if l.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
-              R$ {{ l.valor|floatformat:2 }}
+              {{ moeda_usuario.simbolo }} {{ l.valor|converter_moeda:moeda_usuario.taxa }}
             </td>
           </tr>
           {% empty %}

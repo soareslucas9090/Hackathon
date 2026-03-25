@@ -30,7 +30,7 @@
               {% endif %}
             </td>
             <td class="text-end fw-semibold {% if l.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
-              R$ {{ l.valor|floatformat:2 }}
+              {{ moeda_usuario.simbolo }} {{ l.valor|converter_moeda:moeda_usuario.taxa }}
             </td>
             <td class="text-end">
               <a href="{% url 'financeiro:lancamento-editar' l.pk %}" class="btn btn-sm btn-outline-secondary" title="Editar">

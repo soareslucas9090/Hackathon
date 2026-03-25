@@ -32,7 +32,9 @@ INSTALLED_APPS = [
     # Terceiros
     "simple_history",
     # Projeto
+    "common",
     "Usuario.autenticacao",
+    "Usuario.configuracoes",
     "Financeiro.lancamentos",
 ]
 
@@ -60,6 +62,10 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "common.context_processors.moeda_context",
+            ],
+            "builtins": [
+                "common.templatetags.moeda_tags",
             ],
         },
     },

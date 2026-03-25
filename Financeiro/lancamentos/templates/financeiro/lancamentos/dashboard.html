@@ -67,7 +67,7 @@
               {% endif %}
             </td>
             <td class="text-end fw-semibold {% if l.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
-              R$ {{ l.valor|floatformat:2 }}
+              {{ moeda_usuario.simbolo }} {{ l.valor|converter_moeda:moeda_usuario.taxa }}
             </td>
             <td class="text-end">
               <a href="{% url 'financeiro:lancamento-editar' l.pk %}" class="btn btn-sm btn-outline-secondary">
@@ -95,10 +95,14 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+// Taxa de conversão injetada pelo context processor
+const moedaTaxa = parseFloat("{{ moeda_usuario.taxa }}");
+const moedaSimbolo = "{{ moeda_usuario.simbolo }}";
+
 // ── Gráfico de barras mensal ────────────────────────────────────────────────
 const meses    = {{ grafico_meses|safe }};
-const receitas = {{ grafico_receitas|safe }};
-const despesas = {{ grafico_despesas|safe }};
+const receitas = {{ grafico_receitas|safe }}.map(v => parseFloat((v * moedaTaxa).toFixed(2)));
+const despesas = {{ grafico_despesas|safe }}.map(v => parseFloat((v * moedaTaxa).toFixed(2)));
 
 new Chart(document.getElementById("graficoMensal"), {
   type: "bar",
@@ -132,7 +136,7 @@ new Chart(document.getElementById("graficoMensal"), {
 
 // ── Gráfico de rosca — despesas por categoria ───────────────────────────────
 const catLabels = {{ grafico_cat_labels|safe }};
-const catValores = {{ grafico_cat_valores|safe }};
+const catValores = {{ grafico_cat_valores|safe }}.map(v => parseFloat((v * moedaTaxa).toFixed(2)));
 const catCores   = {{ grafico_cat_cores|safe }};
 
 if (catLabels.length) {

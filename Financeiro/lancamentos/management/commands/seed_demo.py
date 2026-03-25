@@ -24,6 +24,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from Financeiro.lancamentos.models import Categoria, Lancamento
+from Usuario.configuracoes.models import PreferenciaUsuario
 
 User = get_user_model()
 
@@ -76,8 +77,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("=== seed_demo ==="))
         with transaction.atomic():
             for dados in USUARIOS:
-                usuario = self._criar_usuario(dados)
-                cats = self._criar_categorias(usuario)
+                usuario = self._criar_usuario(dados)                self._criar_preferencia(usuario)                cats = self._criar_categorias(usuario)
                 total = self._criar_lancamentos(usuario, cats)
                 self.stdout.write(
                     self.style.SUCCESS(
@@ -105,6 +105,13 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"  Usuário já existe: {usuario.username}")
         return usuario
+
+    def _criar_preferencia(self, usuario):
+        """Cria a preferência de moeda padrão (BRL) para o usuário."""
+        PreferenciaUsuario.objects.get_or_create(
+            usuario=usuario,
+            defaults={"moeda_preferida": "BRL"},
+        )
 
     def _criar_categorias(self, usuario):
         """Cria as categorias padrão para o usuário e devolve dict nome→obj."""

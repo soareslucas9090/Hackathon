@@ -1,0 +1,10 @@
+"""Configuração do app common."""
+from django.apps import AppConfig
+
+
+class CommonConfig(AppConfig):
+    """App de utilitários compartilhados do projeto."""
+
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "common"
+    verbose_name = "Comum"

@@ -6,6 +6,9 @@ __pycache__
 db.sqlite3
 media
 
+# Cache de cotações de moeda (gerado automaticamente, não versionar)
+data/
+
 # Backup files # 
 *.bak 
 

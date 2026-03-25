@@ -3,7 +3,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-body">
         <p class="text-muted small mb-1">Receitas</p>
-        <h4 class="fw-bold text-success mb-0">R$ {{ saldo.receitas|floatformat:2 }}</h4>
+        <h4 class="fw-bold text-success mb-0">{{ moeda_usuario.simbolo }} {{ saldo.receitas|converter_moeda:moeda_usuario.taxa }}</h4>
       </div>
     </div>
   </div>
@@ -11,7 +11,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-body">
         <p class="text-muted small mb-1">Despesas</p>
-        <h4 class="fw-bold text-danger mb-0">R$ {{ saldo.despesas|floatformat:2 }}</h4>
+        <h4 class="fw-bold text-danger mb-0">{{ moeda_usuario.simbolo }} {{ saldo.despesas|converter_moeda:moeda_usuario.taxa }}</h4>
       </div>
     </div>
   </div>
@@ -20,7 +20,7 @@
       <div class="card-body">
         <p class="text-muted small mb-1">Saldo</p>
         <h4 class="fw-bold {% if saldo.saldo >= 0 %}text-primary{% else %}text-danger{% endif %} mb-0">
-          R$ {{ saldo.saldo|floatformat:2 }}
+          {{ moeda_usuario.simbolo }} {{ saldo.saldo|converter_moeda:moeda_usuario.taxa }}
         </h4>
       </div>
     </div>

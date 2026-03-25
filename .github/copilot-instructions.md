@@ -31,7 +31,7 @@ Projeto desenvolvido para o Hackathon **Ctrl+Alt+AI: Hackeando a Rotina de Progr
 - Business, Rules e Helper são injetados via `AppConfig.ready()` para evitar imports circulares.
 - Toda consulta com relacionamentos deve usar `select_related` / `prefetch_related`.
 - Toda operação de escrita no Business deve estar dentro de `transaction.atomic()`.
-
+- **SEMPRE** leia o arquivo architecture-rules.md e siga-o para quaisquer alterações e análises.
 ---
 
 ## Arquitetura em Camadas

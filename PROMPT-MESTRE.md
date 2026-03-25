@@ -11,8 +11,8 @@ Sempre que criar ou editar um código, verifique mentalmente:
 
 ### 1. Estrutura e Padrões Django
 - [ ] O código está no domínio/app correto (separação por módulos)?
-- [ ] Estou usando Class Based Views (CBVs) herdando de `Core.views` (ex: `BasicCreateView`)?
-- [ ] O Model estende `Core.models.BasicModel` (com `created_at`, `updated_at` e history)?
+- [ ] Estou usando Class Based Views (CBVs) herdando de `core.views` (ex: `BasicCreateView`)?
+- [ ] O Model estende `core.models.BasicModel` (com `created_at`, `updated_at` e history)?
 - [ ] As consultas ORM usam `select_related` ou `prefetch_related` sempre que há relacionamentos?
 
 ### 2. Arquitetura em Camadas (MUITO IMPORTANTE)
@@ -26,7 +26,7 @@ Sempre que criar ou editar um código, verifique mentalmente:
 - [ ] Estou lançando `BusinessRulesExceptions` na camada de Rules?
 - [ ] Estou lançando `ProcessException` na camada de Business para erros de processamento?
 - [ ] Estou lançando `SystemErrorException` na camada de Business para erros inesperados?
-- [ ] A View está delegando o tratamento dessas exceções adequadamente (usando os padrões do Core)?
+- [ ] A View está delegando o tratamento dessas exceções adequadamente (usando os padrões do core)?
 
 ### 4. Segurança e UX
 - [ ] A rota criada está protegida (apenas usuário dono dos dados pode acessar)?
@@ -46,7 +46,7 @@ Abaixo está descrito a ordem que a implementação deste projeto deve seguir pa
 
 **⚠️ REGRA DE EXECUÇÃO: A IA deve executar APENAS UM PASSO POR VEZ. É estritamente proibido tentar codificar o Passo 2 antes do usuário aprovar o Passo 1.**
 
-1. Estrutura base: Criação do projeto Django, .gitignore, .env-example, estrutura de pastas por domínio, Core/, Common/, exceções personalizadas, classes base, README inicial
+1. Estrutura base: Criação do projeto Django, .gitignore, .env-example, estrutura de pastas por domínio, core/, common/, exceções personalizadas, classes base, README inicial
 2. Autenticação + Landing: App de usuário, login, landing page, proteção de rotas
 3. Módulo Financeiro: Models (Receita, Despesa, Categoria), camadas business/helper/rules, CBVs, templates com Dasher
 4. Dashboard + Relatórios: Painel de saldo, gráficos, filtros, exportação PDF
@@ -243,9 +243,9 @@ Se preocupe com segurança de dados, e a segurança do projeto. Use as melhores 
 Todos dados sensíveis devem estar dentro de um arquivo .env.
 
 ## Núcleo do sistema
-Crie uma pasta de Core e uma pasta de Commom. Em core ficará as exceções criadas, as classes bases do sistema (basic model, basics views, etc), os mixins (mixins de composição das camas de business, helpers e rules. A instancia do modelo deve ser capaz de chamar qualquer uma das camadas, desde que declaradas, por exemplo, para que eu possa fazer instancia.business.metodo() eu preciso declarar business_class no meu model) e constantes. Em common ficará coisas úteis, como as constantes de texto do sistema, widgets personalizados, etc.
+Crie uma pasta de core e uma pasta de commom. Em core ficará as exceções criadas, as classes bases do sistema (basic model, basics views, etc), os mixins (mixins de composição das camas de business, helpers e rules. A instancia do modelo deve ser capaz de chamar qualquer uma das camadas, desde que declaradas, por exemplo, para que eu possa fazer instancia.business.metodo() eu preciso declarar business_class no meu model) e constantes. Em common ficará coisas úteis, como as constantes de texto do sistema, widgets personalizados, etc.
 
-### Detalhes técnicos do Core
+### Detalhes técnicos do core
 
 Existirá um BasicModel com created_at e updated_at no modelo, além da implementação do history, usando a lib django-simple-history
 
